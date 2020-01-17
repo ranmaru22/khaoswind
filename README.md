@@ -1,3 +1,3 @@
-# Transparent Blue 〜 透明になブルー
+# Transparent Blue 〜 透明なブルー
 
 tbd
