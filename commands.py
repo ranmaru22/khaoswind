@@ -24,7 +24,7 @@ def consolidate_directions(cmd):
     return cmd
 
 
-def parse_command(cmd, location):
+def parse_command(cmd, location, stack):
     """Interprets latest user input."""
 
     # Ignore case and tailing whitespace
@@ -44,19 +44,22 @@ def parse_command(cmd, location):
         target = consolidate_directions(cmd)
         # Check whether there's anything in that direction at the current location
         if target not in location.adj:
-            return "There is nothing in that direction."
+            stack.append("There is nothing in that direction.")
+            return
         return change_loc(location, target)
 
     # If player enters a look command
     if cmd.rsplit(' ', 1)[0] in look_cmds:
-        return location.look()
+        stack.append(location.description)
+        stack.append(location.look())
 
     # If player enters a go command
     if cmd.rsplit(' ', 1)[0] in go_cmds:
         target = consolidate_directions(cmd.rsplit(' ', 1)[-1])
         # Check whether there's anything in that direction at the current location
         if target not in location.adj:
-            return "There is nothing in that direction."
+            stack.append("There is nothing in that direction.")
+            return
         return change_loc(location, target)
 
 

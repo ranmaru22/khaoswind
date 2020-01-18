@@ -3,88 +3,85 @@
 
 import os
 import datetime
-import textwrap as tw
 
 import commands as c
 import locations as loc
-
-from internals import loc_descriptions as ld
-from internals import logo
+import stack as s
 
 
 class TransparentBlue(object):
     """The main class containing the init and run methods."""
 
     def __init__(self):
-        self.current_loc = None
-        self.inventory = None
-        self.prompt = None
-        self.logo = logo.logo
-        self.print_stack = list()
+        # Initalize location objects and set the start location
+        # to South Main Street.
+        self.init_locations()
+        self.current_loc = self.south_main_street
         
-        self.t = tw.TextWrapper()
+        # Start with an empty inventory.
+        self.inventory = None
+        
+        # Set the prompt for the title screen.
+        self.prompt = "Press Enter so start the game ..."
+        
+        # Load the logo.
+        with open("internals/logo.txt") as f_obj:
+            self.logo = f_obj.read()
+        
+        # Initialize the stack.
+        self.stack = s.Stack()
 
-        # Set the start time
+        # Set the start time to 8 PM.
+        # Time has no effect yet, so this is just fluff for now.
         self.time = datetime.time(20, 0)
 
-        # Create the first location
-        # Put this into another file later!
-        main_street = loc.Location()
-        main_street.name = 'South Main Street'
-        main_street.ch_desc(ld.loc_main_street_start)
-        # Change None to item obj for those!
-        main_street.add_item('stick', None)
-        main_street.add_item('pen', None)
-        main_street.add_item('pair of headphones', None)
-        self.current_loc = main_street
-        
-        self.wrapper = tw.TextWrapper(width=80)
-
-        # Set the prompt
-        self.prompt = "Press Enter so start the game ..."
+    def init_locations(self):
+        """Initializes the game's location objects."""
+        # Main Locations
+        # South Main Street
+        self.south_main_street = loc.Location('South Main Street')
+        # Add some sample items. No item objects for now!
+        self.south_main_street.add_item('stick', None)
+        self.south_main_street.add_item('pen', None)
+        self.south_main_street.add_item('pair of headphones', None)
 
     def show_header(self, time_obj, location_obj):
-        """Shows the current location and time at the top."""
+        """Shows the current location and time at the top.
+        This will always be printed before the stack.
+        """
         header = "{:<} {:>{width}}".format(location_obj.name.upper(),
                                            time_obj.strftime("%l:%M %p"),
                                            width=80 - len(location_obj.name))
         return header
 
     def run_game(self):
-        """The main loop for the game."""
+        """The main method for running the game."""
 
-        # Show the title screen
+        # Show the title screen the first time the game starts.
         print(self.logo)
         input(self.prompt)
+        
+        # Push the start location's description to the stack.
+        self.stack.append(self.current_loc.description)
 
-        # Start the loop
+        # Start the main loop
         while True:
         # Clear the screen and show the header
             os.system('clear')
             print(self.show_header(self.time, self.current_loc) + '\r\n')
             
-            # Print the current location's description.
-            for line in self.wrapper.wrap(self.current_loc.description):
-                print(line)
-            
             # Print all info from the stack.
-            for _ in self.print_stack:
-                output = self.print_stack.pop()
-                print('\r\n' + output)
+            self.stack.print_stack()
                 
             # Print the prompt and wait for player input
             self.prompt = self.current_loc.prompt
-            print()
             cmd = input(self.prompt)
             
             # Process the player's input and add the response to the stack
-            nxt = c.parse_command(cmd, self.current_loc)
-            if nxt is None:
-                print("Unknown command.")
-                continue
-            self.print_stack.append(nxt)
+            c.parse_command(cmd, self.current_loc, self.stack)
 
 
 if __name__ == '__main__':
     game = TransparentBlue()
     game.run_game()
+    # print(game.current_loc.description)
