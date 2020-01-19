@@ -81,12 +81,14 @@ class Location(object):
             text = "You see nothing interesting."
         return text
 
-    def move(self, direction):
+    def move(self, current_loc, direction):
         """Reaction to 'go' commands.
         Moves to an adjacent location in the target direction. The methods returns the location object that lies in that direction.
         """
         # If no location is in the target direction, return a comment.
         if direction not in self.allowed_movements:
             return "There is nothing in this direction."
-        # Else return the location object.
-        return self.adj[direction]
+        # Else set the current location to the new object and push its
+        # description onto the stack.
+        current_loc = self.adj[direction]
+        return current_loc

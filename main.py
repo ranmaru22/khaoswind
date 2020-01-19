@@ -43,7 +43,7 @@ class TransparentBlue(object):
         # Create links
         self.loc_south_main_street.add_link('n', self.loc_north_main_street)
         self.loc_north_main_street.add_link('s', self.loc_south_main_street)
-    
+
     def init_items(self):
         """Initializes items at their default locations."""
         item_stick = itm.Item('stick', True, self.loc_south_main_street)
@@ -63,7 +63,8 @@ class TransparentBlue(object):
         while True:
             # Print all info from the stack.
             print()
-            print(self.current_loc, self.current_loc.name)
+            # ! DEBUG MODE! Remove this later ...
+            print("DEBUG MODE --", self.current_loc.name, self.inventory.items)
             self.stack.print_stack()
 
             # Print the prompt and wait for player input
@@ -72,8 +73,8 @@ class TransparentBlue(object):
             cmd = input("> ")
 
             # Process the player's input and add the response to the stack
-            com.parse_command(cmd, self.current_loc,
-                              self.inventory, self.stack)
+            self.current_loc = com.parse_command(cmd, self.current_loc,
+                                                 self.inventory, self.stack)
 
 
 if __name__ == '__main__':

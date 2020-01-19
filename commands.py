@@ -8,7 +8,7 @@ directions = ['n', 'e', 's', 'w', 'north', 'east', 'south', 'west', 'left',
 take_cmds = ['take', 'pick up', 'get']
 
 
-def consolidate_directions(cmd):
+def _consolidate_directions(cmd):
     """Matches equivalent movement commands."""
     if cmd == 'north':
         return 'n'
@@ -25,6 +25,8 @@ def consolidate_directions(cmd):
     return cmd
 
 
+# All public functions must return a location object.
+
 def parse_command(cmd, location, inventory, stack):
     """Interprets latest user input."""
 
@@ -36,69 +38,60 @@ def parse_command(cmd, location, inventory, stack):
         # ADD ALL THIS BACK IN LATER
         # r = input("Are you sure? ([y]es/[n]o) ").lower()
         # if r.startswith('y'):
-            print('Thank you for playing!')
-            raise SystemExit
+        print('Thank you for playing!')
+        raise SystemExit
         # return
 
     # Help command
     elif cmd in ['h', 'help']:
         print("Available commands: LOOK, GO, TAKE, INVENTORY, QUIT")
         print("You can also just enter a direction to go there.")
-        return
+        return location
 
     # Check inventory command
     elif cmd in ['i', 'inv', 'inventory']:
         stack.append(inventory.check())
-        return
+        return location
 
     # If player enters a direction without a keyword
     elif cmd in directions:
-        target = consolidate_directions(cmd)
-        # Check whether there's anything in that direction at the current location
-        if target not in location.adj:
-            stack.append("There is nothing in that direction.")
-            return
-        change_loc(location, target)
-        return
+        direction = _consolidate_directions(cmd)
+        return _change_loc(location, direction)
 
     # If player enters a look command
     elif cmd.rsplit(' ', 1)[0] in look_cmds:
         location.get_desc()
         stack.append(location.description)
         stack.append(location.look())
-        return
+        return location
 
     # If player enters a go command
     elif cmd.rsplit(' ', 1)[0] in go_cmds:
-        target = consolidate_directions(cmd.rsplit(' ', 1)[-1])
-        # Check whether there's anything in that direction at the current location
-        if target not in location.adj:
-            stack.append("There is nothing in that direction.")
-            return
-        change_loc(location, target)
-        return
+        direction = _consolidate_directions(cmd.rsplit(' ', 1)[-1])
+        return _change_loc(location, direction)
 
     # If player enters a take command
     elif cmd.rsplit(' ', 1)[0] in take_cmds:
         item = location.items[cmd.rsplit(' ', 1)[1]]
-        take_item(item, location, inventory, stack)
-        return
+        _take_item(item, location, inventory, stack)
+        return location
 
     # Catch unrecognized commands
     else:
         stack.append("Hmm, that didn't work out.")
+        return location
 
 
-def take_item(item, location, inventory, stack):
+def _take_item(item, location, inventory, stack):
     """Picks up an item."""
     # Check whether the player can pick up the item.
     if not item.allow_pickup:
         stack.append("You cannot pick that up.")
-        return
+        return location
     inventory.add(item, location, stack)
+    return location
 
 
-def change_loc(old_location, new_location):
+def _change_loc(location, direction):
     """Invokes a location change."""
-    old_location = new_location
-    # old_location.move(new_location)
+    return location.move(location, direction)
