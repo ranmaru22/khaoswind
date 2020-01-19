@@ -1,9 +1,7 @@
 """User settings file."""
 
-# tbd
+# TODO: Make this file actually do something.
+
 
 class Settings(object):
-    
-    def __init__(self):
-        pass
-    
+    """This does nothing yet."""
