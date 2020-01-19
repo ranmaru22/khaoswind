@@ -5,13 +5,14 @@ import json
 # Load the location descriptions.
 with open("internals/loc_descriptions.json") as f_obj:
     loc_descriptions = json.load(f_obj)
-    
+
 
 class Location(object):
     """Class template for locations.
     To create adjacent locations, use the base directions only,
     so 'n' instead of 'north' and 'in' instead of 'inside'.
     """
+
     def __init__(self, name):
         """Initializes the base variables."""
         self.name = name
@@ -28,17 +29,17 @@ class Location(object):
         # pull the base description from loc_descriptions.json.
         self.description = None
         self.get_desc()
-        self.prompt = "What do you do? "
+        self.prompt = "What do you do?"
 
     # Methods to add properties to the location.
     # These don't return output!
-    def add_loc(self, direction, location_obj):
-        """Create links to other locations."""
+    def add_link(self, direction, location_obj):
+        """Creates a link to a target location."""
         self.adj[direction] = location_obj
         self.allowed_movements.append(direction)
 
     def add_item(self, item_name, item_obj):
-        """Adds an item to a location."""
+        """Adds an item to the location."""
         self.items[item_name] = item_obj
 
     # Method to change the default prompt.
@@ -49,6 +50,8 @@ class Location(object):
     def get_desc(self):
         """Gets the locations's description text from loc_descriptions.json."""
         self.description = loc_descriptions[self.name][self.status]
+        if self.status == 0:
+            self.status += 1
 
     # Methods which react to player input.
     # Always return output which then goes to the stack. If they
@@ -62,19 +65,17 @@ class Location(object):
         # If there is more than one item, return a string that lists all the
         # items in a comma-separated sentence.
         elif len(self.items) > 1:
-            text = f"You see {len(self.items)} things.\r\n"
             first = True
-            item_str = str()
+            text = str()
             for item in self.items:
                 if first:
-                    item_str += f"A {item}"
+                    item_str += f"You see a {item}"
                     first = False
                 else:
                     item_str += f", a {item}"
             else:
                 item_str = item_str.rsplit(
                     ', a', 1)[0] + ', and a' + item_str.rsplit(', a', 1)[-1] + '.'
-                text += item_str
         # Catch-all clause if there is nothing to be seen.
         else:
             text = "You see nothing interesting."
@@ -89,4 +90,3 @@ class Location(object):
             return "There is nothing in this direction."
         # Else return the location object.
         return self.adj[direction]
-    

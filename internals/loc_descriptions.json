@@ -1,5 +1,13 @@
 {
     "South Main Street": [
-        "You are standing in the middle of an empty street. It should not be this empty. Looking at your watch, you realize that it is still early. No need to go home yet."
+        "You are standing in the middle of an empty street. You have the feeling that it should not be this empty. Somehow, you remember, it used to be filled with people. \n\nNow that you think about, you don't really remember how you got here. Your memory in general is a bit hazy. Maybe you drank too much last night.",
+        
+        "You are in the Southern part of Main Street. There are still no people anywhere to be seen."
+    ],
+
+    "North Main Street": [
+        "You are at a crossroads. To the West is small street that looks all but deserted. To the East is a slightly bigger street from which you hear some noise. There are a few people walking around. \n\nYou know this place. You've been here before many times. There are some bars nearby.",
+
+        "You are in the Northern part of Main Street, standing at the crossroads that lead to the bars and clubs."
     ]
 }
