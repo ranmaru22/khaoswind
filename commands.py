@@ -25,7 +25,7 @@ def _consolidate_directions(cmd):
     return cmd
 
 
-# All public functions must return a location object.
+# ! All public functions must return a location object.
 
 def parse_command(cmd, location, inventory, stack):
     """Interprets latest user input."""
@@ -56,7 +56,12 @@ def parse_command(cmd, location, inventory, stack):
     # If player enters a direction without a keyword
     elif cmd in directions:
         direction = _consolidate_directions(cmd)
-        return _change_loc(location, direction)
+        return _change_loc(location, direction, stack)
+
+    # If player enters a go command
+    elif cmd.rsplit(' ', 1)[0] in go_cmds:
+        direction = _consolidate_directions(cmd.rsplit(' ', 1)[-1])
+        return _change_loc(location, direction, stack)
 
     # If player enters a look command
     elif cmd.rsplit(' ', 1)[0] in look_cmds:
@@ -64,11 +69,6 @@ def parse_command(cmd, location, inventory, stack):
         stack.append(location.description)
         stack.append(location.look())
         return location
-
-    # If player enters a go command
-    elif cmd.rsplit(' ', 1)[0] in go_cmds:
-        direction = _consolidate_directions(cmd.rsplit(' ', 1)[-1])
-        return _change_loc(location, direction)
 
     # If player enters a take command
     elif cmd.rsplit(' ', 1)[0] in take_cmds:
@@ -92,6 +92,6 @@ def _take_item(item, location, inventory, stack):
     return location
 
 
-def _change_loc(location, direction):
+def _change_loc(location, direction, stack):
     """Invokes a location change."""
-    return location.move(location, direction)
+    return location.move(location, direction, stack)

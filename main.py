@@ -56,7 +56,7 @@ class TransparentBlue(object):
         input(self.prompt)
 
         # Push the start location's description to the stack.
-        self.stack.append(self.current_loc.description)
+        self.stack.append(self.current_loc.get_desc())
 
         # Start the main loop
         os.system('clear')

@@ -28,7 +28,6 @@ class Location(object):
         # Upon creation, the new location object will automatically
         # pull the base description from loc_descriptions.json.
         self.description = None
-        self.get_desc()
         self.prompt = "What do you do?"
 
     # Methods to add properties to the location.
@@ -52,6 +51,7 @@ class Location(object):
         self.description = loc_descriptions[self.name][self.status]
         if self.status == 0:
             self.status += 1
+        return self.description
 
     # Methods which react to player input.
     # Always return output which then goes to the stack. If they
@@ -81,14 +81,16 @@ class Location(object):
             text = "You see nothing interesting."
         return text
 
-    def move(self, current_loc, direction):
+    def move(self, current_loc, direction, stack):
         """Reaction to 'go' commands.
         Moves to an adjacent location in the target direction. The methods returns the location object that lies in that direction.
         """
         # If no location is in the target direction, return a comment.
         if direction not in self.allowed_movements:
-            return "There is nothing in this direction."
+            stack.append("There is nothing in this direction.")
+            return current_loc
         # Else set the current location to the new object and push its
         # description onto the stack.
         current_loc = self.adj[direction]
+        stack.append(current_loc.get_desc())
         return current_loc
