@@ -2,86 +2,81 @@
 
 
 import os
-import datetime
+import time
 
-import commands as c
+import commands as com
 import locations as loc
-import stack as s
+import stack as st
+import inventory as inv
+import items as itm
 
 
 class TransparentBlue(object):
     """The main class containing the init and run methods."""
 
     def __init__(self):
-        # Initalize location objects and set the start location
-        # to South Main Street.
+        # Initalize location objects, item objects, and set the
+        # start location to South Main Street.
         self.init_locations()
-        self.current_loc = self.south_main_street
-        
+        self.init_items()
+        self.current_loc = self.loc_south_main_street
+
         # Start with an empty inventory.
-        self.inventory = None
-        
+        self.inventory = inv.Inventory()
+
         # Set the prompt for the title screen.
         self.prompt = "Press Enter so start the game ..."
-        
+
         # Load the logo.
         with open("internals/logo.txt") as f_obj:
             self.logo = f_obj.read()
-        
-        # Initialize the stack.
-        self.stack = s.Stack()
 
-        # Set the start time to 8 PM.
-        # Time has no effect yet, so this is just fluff for now.
-        self.time = datetime.time(20, 0)
+        # Initialize the stack.
+        self.stack = st.Stack()
 
     def init_locations(self):
         """Initializes the game's location objects."""
         # Main Locations
         # South Main Street
-        self.south_main_street = loc.Location('South Main Street')
-        # Add some sample items. No item objects for now!
-        self.south_main_street.add_item('stick', None)
-        self.south_main_street.add_item('pen', None)
-        self.south_main_street.add_item('pair of headphones', None)
+        self.loc_south_main_street = loc.Location('South Main Street')
+        self.loc_north_main_street = loc.Location('North Main Street')
+        # Create links
+        self.loc_south_main_street.add_link('n', self.loc_north_main_street)
+        self.loc_north_main_street.add_link('s', self.loc_south_main_street)
+    
+    def init_items(self):
+        """Initializes items at their default locations."""
+        item_stick = itm.Item('stick', True, self.loc_south_main_street)
 
-    def show_header(self, time_obj, location_obj):
-        """Shows the current location and time at the top.
-        This will always be printed before the stack.
-        """
-        header = "{:<} {:>{width}}".format(location_obj.name.upper(),
-                                           time_obj.strftime("%l:%M %p"),
-                                           width=80 - len(location_obj.name))
-        return header
-
-    def run_game(self):
+    def main(self):
         """The main method for running the game."""
-
         # Show the title screen the first time the game starts.
+        os.system('clear')
         print(self.logo)
         input(self.prompt)
-        
+
         # Push the start location's description to the stack.
         self.stack.append(self.current_loc.description)
 
         # Start the main loop
+        os.system('clear')
         while True:
-        # Clear the screen and show the header
-            os.system('clear')
-            print(self.show_header(self.time, self.current_loc) + '\r\n')
-            
             # Print all info from the stack.
+            print()
+            print(self.current_loc, self.current_loc.name)
             self.stack.print_stack()
-                
+
             # Print the prompt and wait for player input
             self.prompt = self.current_loc.prompt
-            cmd = input(self.prompt)
-            
+            print(self.prompt)
+            cmd = input("> ")
+
             # Process the player's input and add the response to the stack
-            c.parse_command(cmd, self.current_loc, self.stack)
+            com.parse_command(cmd, self.current_loc,
+                              self.inventory, self.stack)
 
 
 if __name__ == '__main__':
     game = TransparentBlue()
-    game.run_game()
-    # print(game.current_loc.description)
+    game.main()
+    # print(game.current_loc.items)
