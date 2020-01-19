@@ -15,7 +15,7 @@ class Stack(object):
         self.items = list()
                 
         # Initialize the TextWrapper object.
-        self.wrapper = tw.TextWrapper(width=80)
+        self.wrapper = tw.TextWrapper(width=80, replace_whitespace=False)
         
     def append(self, item):
         """Add an item to the stack."""
@@ -28,8 +28,10 @@ class Stack(object):
     
     def print_stack(self):
         """Empties the stack and prints all the items on it."""
-        for item in self.items:
+        self.items.reverse()
+        while self.items:
+            item = self.items.pop()
             for line in self.wrapper.wrap(item):
                 print(line)
-            print('\n')
+            print('')
     
