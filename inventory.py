@@ -25,17 +25,19 @@ class Inventory(object):
         # If there is more than one item, return a string that lists all the
         # items in a comma-separated sentence.
         elif len(self.items) > 1:
-            is_first = True
+            first = True
             text = str()
             for item in self.items:
-                if is_first:
-                    item_str += f"You carry a {item.name}"
-                    is_first = False
+                article = 'an' if item.name.startswith(
+                    ('a', 'i', 'u', 'e', 'o')) else 'a'
+                if first:
+                    text += f"You carry {article} {item.name}"
+                    first = False
                 else:
-                    item_str += f", a {item.name}"
+                    text += f", {article} {item.name}"
             else:
-                item_str = item_str.rsplit(
-                    ', a', 1)[0] + ', and a' + item_str.rsplit(', a', 1)[-1] + '.'
+                text = text.rsplit(
+                    f', {article}', 1)[0] + f', and {article}' + text.rsplit(f', {article}', 1)[-1] + '.'
         # Catch-all clause if inventory is empty.
         else:
             text = "You don't carry anything."

@@ -64,42 +64,52 @@ class Location(object):
     # Always return output which then goes to the stack. If they
     # don't return output directly, they call functions which do.
     def look(self):
-        """Reaction to 'look' commands."""
-
+        """Reaction to 'look' command."""
+        text = str()
         # If there is only one item, return a short string.
         if len(self.items) == 1:
-            text = f"You see a {next(iter(self.items))}."
+            item = next(iter(self.items))
+            article = 'an' if item.startswith(
+                ('a', 'i', 'u', 'e', 'o')) else 'a'
+            text_items = f"You see {article} {item}."
+            text += text_items
         # If there is more than one item, return a string that lists all the
         # items in a comma-separated sentence.
         elif len(self.items) > 1:
             first = True
-            text = str()
+            text_items = str()
             for item in self.items:
+                article = 'an' if item.startswith(
+                    ('a', 'i', 'u', 'e', 'o')) else 'a'
                 if first:
-                    item_str += f"You see a {item}"
+                    text_items += f"You see {article} {item}"
                     first = False
                 else:
-                    item_str += f", a {item}"
+                    text_items += f", {article} {item}"
             else:
-                item_str = item_str.rsplit(
-                    ', a', 1)[0] + ', and a' + item_str.rsplit(', a', 1)[-1] + '.'
+                text_items = text_items.rsplit(
+                    f', {article}', 1)[0] + f', and {article}' + text_items.rsplit(f', {article}', 1)[-1] + '.'
+            text += text_items
+
         # Next, check for NPCs in the same way.
         if len(self.npcs) == 1:
-            text = f"You see {next(iter(self.npcs)).capitalize()}."
+            text_npc = f"You see {next(iter(self.npcs)).capitalize()}."
+            text += "\n" + text_npc
         elif len(self.npcs) > 1:
             first = True
-            text = str()
+            text_npc = str()
             for npc in self.npcs:
                 if first:
-                    npcs_str += f"{npc.capitalize()}"
+                    text_npc += f"{npc.capitalize()}"
                     first = False
                 else:
-                    npc_str += f", {npc.capitalize()}"
+                    text_npc += f", {npc.capitalize()}"
             else:
-                npc_str = npc_str.rsplit(
-                    ', ', 1)[0] + ', and ' + npc_str.rsplit(', ', 1)[-1] + ' are standing there.'
+                text_npc = text_npc.rsplit(
+                    ', ', 1)[0] + ', and ' + text_npc.rsplit(', ', 1)[-1] + ' are standing there.'
+            text += "\n" + text_npc
         # Catch-all clause if there is nothing to be seen.
-        else:
+        if not text:
             text = "You see nothing interesting."
         return text
 

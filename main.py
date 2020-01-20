@@ -56,6 +56,9 @@ class TransparentBlue(object):
     def init_items(self):
         """Initializes items at their default locations."""
         item_stick = itm.Item('stick', True, self.loc_south_main_street)
+        item_cig = itm.Item('cigarette', True, self.loc_south_main_street)
+        item_phone = itm.Item('phone', True, self.loc_south_main_street)
+        item_debug = itm.Item('oogie', True, self.loc_south_main_street)
 
     def init_npcs(self):
         """Initializes NPCs in their locations."""

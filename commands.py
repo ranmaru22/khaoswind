@@ -91,7 +91,15 @@ def parse_command(cmd, location, inventory, stack):
 
     # If player enters a take command
     elif cmd.startswith('take'):
-        item = location.items[cmd.rsplit(' ', 1)[1]]
+        if len(cmd.split(' ')) == 1:
+            stack.append("There is nothing there ...")
+            return location
+        if len(cmd.split(' ')) > 1:
+            target = cmd.rsplit(' ', 1)[-1]
+            if target not in location.items:
+                stack.append("There is nothing there ...")
+                return location
+        item = location.items[target]
         _take_item(item, location, inventory, stack)
         return location
 
