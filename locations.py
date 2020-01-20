@@ -25,6 +25,9 @@ class Location(object):
         # Items found.
         self.items = dict()
 
+        # NPCs in the location.
+        self.npcs = dict()
+
         # Upon creation, the new location object will automatically
         # pull the base description from loc_descriptions.json.
         self.description = None
@@ -40,6 +43,10 @@ class Location(object):
     def add_item(self, item_name, item_obj):
         """Adds an item to the location."""
         self.items[item_name] = item_obj
+
+    def add_npc(self, npc_obj):
+        """Adds an NPC to the location."""
+        self.npcs[npc_obj.name] = npc_obj
 
     # Method to change the default prompt.
     def ch_prompt(self, prompt):
@@ -76,6 +83,21 @@ class Location(object):
             else:
                 item_str = item_str.rsplit(
                     ', a', 1)[0] + ', and a' + item_str.rsplit(', a', 1)[-1] + '.'
+        # Next, check for NPCs in the same way.
+        if len(self.npcs) == 1:
+            text = f"You see {next(iter(self.npcs)).capitalize()}."
+        elif len(self.npcs) > 1:
+            first = True
+            text = str()
+            for npc in self.npcs:
+                if first:
+                    npcs_str += f"{npc.capitalize()}"
+                    first = False
+                else:
+                    npc_str += f", {npc.capitalize()}"
+            else:
+                npc_str = npc_str.rsplit(
+                    ', ', 1)[0] + ', and ' + npc_str.rsplit(', ', 1)[-1] + ' are standing there.'
         # Catch-all clause if there is nothing to be seen.
         else:
             text = "You see nothing interesting."
