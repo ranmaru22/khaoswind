@@ -115,7 +115,8 @@ class Location(object):
 
     def move(self, current_loc, direction, stack):
         """Reaction to 'go' commands.
-        Moves to an adjacent location in the target direction. The methods returns the location object that lies in that direction.
+        Moves to an adjacent location in the target direction. The method
+        returns the location object that lies in that direction.
         """
         # If no location is in the target direction, return a comment.
         if direction not in self.allowed_movements:
