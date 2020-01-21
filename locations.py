@@ -94,7 +94,7 @@ class Location(object):
         # Next, check for NPCs in the same way.
         if len(self.npcs) == 1:
             text_npc = f"You see {next(iter(self.npcs)).capitalize()}."
-            text += "\n" + text_npc
+            text += text_npc
         elif len(self.npcs) > 1:
             first = True
             text_npc = str()

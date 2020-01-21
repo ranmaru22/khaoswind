@@ -88,8 +88,8 @@ class TransparentBlue(object):
             cmd = input("> ")
 
             # Process the player's input and add the response to the stack
-            self.current_loc = com.parse_command(cmd, self.current_loc,
-                                                 self.inventory, self.stack)
+            self.current_loc = com.parser(cmd, self.current_loc,
+                                          self.inventory, self.stack)
 
 
 if __name__ == '__main__':
