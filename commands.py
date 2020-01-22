@@ -158,7 +158,6 @@ def _talk(location, stack, *args):
 
 def _use(location, stack, inventory, *args):
     """Uses an item, or interacts with something at the location."""
-    print(args)
     if args is (None, None):
         stack.append("You wanted to use something, didn't you?")
         return location
