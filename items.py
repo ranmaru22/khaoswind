@@ -10,10 +10,12 @@ with open("internals/item_descriptions.json") as f_obj:
 class Item(object):
     """Template class for items."""
 
-    def __init__(self, name, allow_pickup, location):
+    def __init__(self, name, allow_pickup, is_usable, location):
         self.name = name
         self.status = 0
         self.allow_pickup = allow_pickup
+        self.is_usable = is_usable
+        self.usable_with = list()
         self.location = location
 
         # Upon creation, the new location object will automatically

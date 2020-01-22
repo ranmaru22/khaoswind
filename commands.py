@@ -38,6 +38,12 @@ def parser(cmd, location, inventory, stack):
     if func in ['talk', 'talk to']:
         return _talk(location, stack, target)
 
+    if func.startswith('use'):
+        item = None
+        if len(func.split()) == 3:
+            func, item, _ = func.split()
+        return _use(location, stack, inventory, item, target)
+
     # If the player's input matches none of the commands:
     stack.append("Hmm, that didn't work out.")
     return location
@@ -74,7 +80,7 @@ def _system_exit():
 def _print_help(location):
     """Prints available commands."""
     print(
-        "Available commands: LOOK (AT), GO, TAKE, TALK (TO), I[NVENTORY], Q[UIT]")
+        "Available commands: LOOK (AT), GO, TAKE, TALK TO, I[NVENTORY], Q[UIT]")
     print("You can also just enter a direction to go there.")
     return location
 
@@ -133,6 +139,7 @@ def _change_loc(location, direction, stack):
 
 
 def _talk(location, stack, *args):
+    """Talks to an NPC."""
     if args[0] is None:
         stack.append("Did you often talk to yourself?")
         return location
@@ -146,4 +153,40 @@ def _talk(location, stack, *args):
     keyword = unicodedata.normalize("NFKD", keyword.casefold().strip())
     npc = location.npcs[target]
     npc.trigger_conv(keyword, stack)
+    return location
+
+
+def _use(location, stack, inventory, *args):
+    """Uses an item, or interacts with something at the location."""
+    print(args)
+    if args is (None, None):
+        stack.append("You wanted to use something, didn't you?")
+        return location
+    item, target = args[1], args[0]
+
+    try:
+        item_obj = location.items[item]
+    except KeyError:
+        stack.append(f"There was no {item} in sight.")
+        return location
+    if not item_obj.is_usable:
+        stack.append("There was no way you could do that.")
+        return location
+    if target is None:
+        stack.append(f"You used the {item_obj.name}.")
+        # TODO: Add the interact function here.
+        return location
+
+    try:
+        target_obj = inventory.items[target]
+    except KeyError:
+        stack.append(f"You didn't have anything like that.")
+        return location
+    # ? Does the order matter?
+    if target_obj not in location.items[item].usable_with:
+        stack.append(
+            f"You tried using your {target_obj.name}, but it didn't work.")
+        return location
+    # TODO: Add the interact function here.
+    stack.append(f"You used your {target_obj.name} with the {item_obj.name}.")
     return location
