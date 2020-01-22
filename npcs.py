@@ -12,17 +12,9 @@ with open("internals/conversations.json") as f_obj:
 class NPC(object):
     """Base class for NPC objects."""
 
-    def __init__(self, name, location_obj):
+    def __init__(self, name, location):
         self.name = name
-        self.location = location_obj
-        self.finished_convs = list()
-
-        # Add NPC to the location.
-        location_obj.add_npc(self)
-
-    def finish_conv(self, keyword):
-        """Adds a conversation to the NPC's stack of finished conversations."""
-        self.finished_convs.append(keyword)
+        self.location = location
 
     def trigger_conv(self, keyword, stack):
         """Triggers a conversation. Loads the lines from conversations.json and
@@ -32,7 +24,4 @@ class NPC(object):
             stack.append("\"I don't know anything about that ...\"", 1)
             return
         for line in conversations[self.name][keyword]:
-            stack.append(line, 1)
-        # Add the conversation to the list of finished ones.
-        # This might be useful in the future ...
-        self.finish_conv(keyword)
+            stack.append(f'"{line}"', 1)

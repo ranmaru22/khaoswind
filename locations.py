@@ -22,16 +22,10 @@ class Location(object):
         self.adj = dict()
         self.allowed_movements = list()
 
-        # Items found.
-        self.items = dict()
-
-        # NPCs in the location.
-        self.npcs = dict()
-
         # Upon creation, the new location object will automatically
         # pull the base description from loc_descriptions.json.
         self.description = None
-        self.prompt = "What do you do?"
+        self.prompt = "What did you do next?"
 
     # Methods to add properties to the location.
     # These don't return output!
@@ -39,14 +33,6 @@ class Location(object):
         """Creates a link to a target location."""
         self.adj[direction] = location_obj
         self.allowed_movements.append(direction)
-
-    def add_item(self, item_name, item_obj):
-        """Adds an item to the location."""
-        self.items[item_name] = item_obj
-
-    def add_npc(self, npc_obj):
-        """Adds an NPC to the location."""
-        self.npcs[npc_obj.name] = npc_obj
 
     # Method to change the default prompt.
     def ch_prompt(self, prompt):
@@ -63,54 +49,62 @@ class Location(object):
     # Methods which react to player input.
     # Always return output which then goes to the stack. If they
     # don't return output directly, they call functions which do.
-    def look(self):
+    def look(self, items, npcs):
         """Reaction to 'look' command."""
+        items_here = list()
+        npcs_here = list()
+        for item in items:
+            if item.location == self:
+                items_here.append(item)
+        for npc in npcs:
+            if npc.location == self:
+                npcs_here.append(npc)
         text = str()
         # If there is only one item, return a short string.
-        if len(self.items) == 1:
-            item = next(iter(self.items))
-            article = 'an' if item.startswith(
+        if len(items_here) == 1:
+            item = next(iter(items_here))
+            article = 'an' if item.name.startswith(
                 ('a', 'i', 'u', 'e', 'o')) else 'a'
-            text_items = f"You see {article} {item}."
+            text_items = f"You saw {article} {item.name}. "
             text += text_items
         # If there is more than one item, return a string that lists all the
         # items in a comma-separated sentence.
-        elif len(self.items) > 1:
+        elif len(items_here) > 1:
             first = True
             text_items = str()
-            for item in self.items:
-                article = 'an' if item.startswith(
+            for item in items_here:
+                article = 'an' if item.name.startswith(
                     ('a', 'i', 'u', 'e', 'o')) else 'a'
                 if first:
-                    text_items += f"You see {article} {item}"
+                    text_items += f"You saw {article} {item.name}"
                     first = False
                 else:
-                    text_items += f", {article} {item}"
+                    text_items += f", {article} {item.name}"
             else:
                 text_items = text_items.rsplit(
-                    f', {article}', 1)[0] + f', and {article}' + text_items.rsplit(f', {article}', 1)[-1] + '.'
+                    f', {article}', 1)[0] + f', and {article}' + text_items.rsplit(f', {article}', 1)[-1] + '. '
             text += text_items
 
         # Next, check for NPCs in the same way.
-        if len(self.npcs) == 1:
-            text_npc = f"You see {next(iter(self.npcs)).capitalize()}."
+        if len(npcs_here) == 1:
+            text_npc = f"You saw {next(iter(npcs_here)).name.capitalize()}."
             text += text_npc
-        elif len(self.npcs) > 1:
+        elif len(npcs_here) > 1:
             first = True
             text_npc = str()
-            for npc in self.npcs:
+            for npc in npcs_here:
                 if first:
-                    text_npc += f"{npc.capitalize()}"
+                    text_npc += f"{npc.name.capitalize()}"
                     first = False
                 else:
-                    text_npc += f", {npc.capitalize()}"
+                    text_npc += f", {npc.name.capitalize()}"
             else:
                 text_npc = text_npc.rsplit(
-                    ', ', 1)[0] + ', and ' + text_npc.rsplit(', ', 1)[-1] + ' are standing there.'
+                    ', ', 1)[0] + ', and ' + text_npc.rsplit(', ', 1)[-1] + ' were standing there.'
             text += "\n" + text_npc
         # Catch-all clause if there is nothing to be seen.
         if not text:
-            text = "You see nothing interesting."
+            text = "You saw nothing interesting."
         return text
 
     def move(self, current_loc, direction, stack):

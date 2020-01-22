@@ -3,6 +3,7 @@
 
 import os
 import time
+import random
 
 import commands as com
 import locations as loc
@@ -16,15 +17,12 @@ class TransparentBlue(object):
     """The main class containing the init and run methods."""
 
     def __init__(self):
-        # Initalize location objects, item objects, and set the
-        # start location to South Main Street.
-        self.init_locations()
-        self.init_items()
-        self.init_npcs()
-        self.current_loc = self.loc_south_main_street
-
-        # Start with an empty inventory.
+        # Initalize the base variables.
+        self.locations = self.init_locations()
+        self.items = self.init_items()
+        self.npcs = self.init_npcs()
         self.inventory = inv.Inventory()
+        self.current_loc = random.choice(self.locations)
 
         # Set the prompt for the title screen.
         self.prompt = "Press Enter so start the game ..."
@@ -39,31 +37,35 @@ class TransparentBlue(object):
     def init_locations(self):
         """Initializes the game's location objects."""
         # Main Locations
-        # Main Street
-        self.loc_south_main_street = loc.Location('South Main Street')
-        self.loc_north_main_street = loc.Location('North Main Street')
-        # Side Street
-        self.loc_east_side_street = loc.Location('East Side Street')
-        self.loc_west_side_street = loc.Location('West Side Street')
+        rooms = [
+            # loc.Location('1-1'),
+            # loc.Location('1-2'),
+            # loc.Location('2-1'),
+            loc.Location('2-2')
+        ]
         # Create links
-        self.loc_south_main_street.add_link('n', self.loc_north_main_street)
-        self.loc_north_main_street.add_link('s', self.loc_south_main_street)
-        self.loc_north_main_street.add_link('e', self.loc_east_side_street)
-        self.loc_east_side_street.add_link('w', self.loc_north_main_street)
-        self.loc_north_main_street.add_link('w', self.loc_west_side_street)
-        self.loc_west_side_street.add_link('e', self.loc_north_main_street)
+        return rooms
 
     def init_items(self):
         """Initializes items at their default locations."""
-        item_stick = itm.Item('stick', True, False, self.loc_south_main_street)
-        item_phone = itm.Item('phone', False, False,
-                              self.loc_south_main_street)
-        item_debug = itm.Item('oogie', False, True, self.loc_south_main_street)
-        item_debug.usable_with.append(item_stick)
+        items = [
+            itm.Item('stick', random.choice(self.locations), True),
+            itm.Item('foo', random.choice(self.locations), False, True),
+            itm.Item('oogie', random.choice(
+                self.locations), False, True, ['stick'])
+        ]
+        return items
 
     def init_npcs(self):
         """Initializes NPCs in their locations."""
-        npc_sample = npc.NPC('sample', self.loc_east_side_street)
+        npcs = [
+            npc.NPC('sample', random.choice(self.locations))
+        ]
+        return npcs
+
+    def intro(self):
+        """Plays the intro sequence of the game and gets input."""
+        # self.stack.append
 
     def main(self):
         """The main method for running the game."""
@@ -90,7 +92,7 @@ class TransparentBlue(object):
 
             # Process the player's input and add the response to the stack
             self.current_loc = com.parser(cmd, self.current_loc,
-                                          self.inventory, self.stack)
+                                          self.inventory, self.locations, self.items, self.npcs, self.stack)
 
 
 if __name__ == '__main__':

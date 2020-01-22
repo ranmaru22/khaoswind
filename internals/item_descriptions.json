@@ -1,6 +1,5 @@
 {
   "stick": ["A small stick. It does not look very useful."],
-  "cigarette": ["A half-broken Morley. You don't smoke, do you?"],
-  "phone": ["A flip phone. You haven't seen one of those in a long time."],
+  "foo": ["Debug item."],
   "oogie": ["Debug item."]
 }

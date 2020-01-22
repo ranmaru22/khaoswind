@@ -10,30 +10,23 @@ with open("internals/item_descriptions.json") as f_obj:
 class Item(object):
     """Template class for items."""
 
-    def __init__(self, name, allow_pickup, is_usable, location):
+    def __init__(self, name, location, allow_pickup=False, is_usable=False, usable_with=[]):
         self.name = name
         self.status = 0
+        self.location = location
         self.allow_pickup = allow_pickup
         self.is_usable = is_usable
-        self.usable_with = list()
+        self.usable_with = usable_with
         self.used = False
-        self.location = location
 
         # Upon creation, the new location object will automatically
         # pull the base description from loc_descriptions.json.
         self.description = None
         self._get_desc()
 
-        # Add it to the location
-        self._add_to_loc(location)
-
     def _get_desc(self):
         """Gets the items's description text from item_descriptions.json."""
         self.description = item_descriptions[self.name][self.status]
-
-    def _add_to_loc(self, location):
-        """Adds the item to the location's inventory."""
-        location.add_item(self.name, self)
 
     def pick_up(self, inventory, location, stack):
         """Adds the item to the player's inventory and removes it from the

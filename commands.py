@@ -3,7 +3,7 @@
 import unicodedata
 
 
-def parser(cmd, location, inventory, stack):
+def parser(cmd, location, inventory, locations, items, npcs, stack):
     """New version."""
     # TODO: Run some tests on this before pushing it to master.
     directions = ['n', 'e', 's', 'w', 'north', 'east', 'south', 'west', 'left',
@@ -30,19 +30,19 @@ def parser(cmd, location, inventory, stack):
 
     # Call the appropriate function.
     if func in ['look', 'look at']:
-        return _look(location, stack, target)
+        return _look(location, items, npcs, stack, target)
     if func in ['go']:
         return _change_loc(location, target, stack)
     if func in ['take']:
-        return _take(location, inventory, stack, target)
+        return _take(location, items, inventory, stack, target)
     if func in ['talk', 'talk to']:
-        return _talk(location, stack, target)
+        return _talk(location, npcs, stack, target)
 
     if func.startswith('use'):
         item = None
         if len(func.split()) == 3:
             func, item, _ = func.split()
-        return _use(location, stack, inventory, item, target)
+        return _use(location, items, inventory, stack, item, target)
 
     # If the player's input matches none of the commands:
     stack.append("Hmm, that didn't work out.")
@@ -91,7 +91,7 @@ def _show_inventory(location, inventory, stack):
     return location
 
 
-def _look(location, stack, *args):
+def _look(location, items, npcs, stack, *args):
     """Looks at an item or the location."""
     if args[0] is not None:
         target = args[0]
@@ -100,30 +100,34 @@ def _look(location, stack, *args):
             stack.append("What did you want to look at?")
             return location
         # Check whether the item is actually there.
-        if target in location.items.keys():
-            stack.append(location.items[target].description)
+        item_names = [x.name for x in items]
+        if target in item_names:
+            item = items[item_names.index(target)]
+            stack.append(item.description)
             return location
         stack.append(f"There's no {target} in sight.")
         return location
     # If no argument was sent, inspect the location itself.
     location.get_desc()
     stack.append(location.description)
-    stack.append(location.look())
+    stack.append(location.look(items, npcs))
     return location
 
 
-def _take(location, inventory, stack, *args):
+def _take(location, items, inventory, stack, *args):
     """Picks up an item."""
+    print(items)
     if args[0] is None:
         stack.append("What did you want to take again?")
         return location
     target = args[0]
-    if target not in location.items:
-        stack.append("There is nothing there ...")
+    item_names = [x.name for x in items]
+    if target not in item_names:
+        stack.append("Whatever you wanted to take, it was not there ...")
         return location
-    item = location.items[target]
+    item = items[item_names.index(target)]
     if not item.allow_pickup:
-        stack.append("You cannot pick that up.")
+        stack.append("You could not pick that up.")
         return location
     inventory.add(item, location, stack)
     return location
@@ -138,33 +142,35 @@ def _change_loc(location, direction, stack):
     return location.move(location, direction, stack)
 
 
-def _talk(location, stack, *args):
+def _talk(location, npcs, stack, *args):
     """Talks to an NPC."""
     if args[0] is None:
         stack.append("Did you often talk to yourself?")
         return location
     target = args[0]
     # Check whether that NPC is at the player's location.
-    if target not in location.npcs:
+    npc_names = [x.name for x in npcs]
+    if target not in npc_names:
         stack.append("No, there's no one there ...")
         return location
     # Ask for a keyword and trigger a conversation.
-    keyword = input("\nWhat did you mean to ask them?\n> ")
+    keyword = input("\nWhat was it you asked them?\n> ")
     keyword = unicodedata.normalize("NFKD", keyword.casefold().strip())
-    npc = location.npcs[target]
+    npc = npcs[npc_names.index(target)]
     npc.trigger_conv(keyword, stack)
     return location
 
 
-def _use(location, stack, inventory, *args):
+def _use(location, items, inventory, stack, *args):
     """Uses an item, or interacts with something at the location."""
-    if args is (None, None):
+    if args == (None, None):
         stack.append("You wanted to use something, didn't you?")
         return location
-    item, target = args[1], args[0]
-
+    else:
+        item, target = args[1], args[0]
     try:
-        item_obj = location.items[item]
+        item_names = [x.name for x in items]
+        item_obj = items[item_names.index(item)]
     except KeyError:
         stack.append(f"There was no {item} in sight.")
         return location
@@ -182,14 +188,16 @@ def _use(location, stack, inventory, *args):
         stack.append(f"You used the {item_obj.name}.")
         item_obj.used = True
         return location
-
     try:
-        target_obj = inventory.items[target]
+        target_obj = items[item_names.index(target)]
     except KeyError:
         stack.append(f"You didn't have anything like that.")
         return location
+    if target_obj.location.name != "Inventory":
+        stack.append(f"You didn't have anything like that.")
+        return location
     # ? Does the order matter?
-    if target_obj not in location.items[item].usable_with:
+    if target_obj.name not in item_obj.usable_with:
         stack.append(
             f"You tried using your {target_obj.name}, but it didn't work.")
         return location

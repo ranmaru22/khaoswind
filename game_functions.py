@@ -9,4 +9,4 @@ def print_speak(text):
     for c in (text + '\n'):
         sys.stdout.write(c)
         sys.stdout.flush()
-        time.sleep(3/50)
+        time.sleep(1/50)

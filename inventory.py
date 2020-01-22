@@ -6,6 +6,7 @@ class Inventory(object):
 
     def __init__(self):
         self.items = dict()
+        self.name = "Inventory"
 
     def add(self, item_obj, location_obj, stack):
         """Adds an item to the player's inventory, removes it from the location
@@ -16,7 +17,6 @@ class Inventory(object):
         self.items[item_obj.name] = item_obj
         item_obj.location = self
         if location_obj is not None:
-            del location_obj.items[item_obj.name]
             stack.append(f"You picked up the {item_obj.name}.")
 
     def check(self):
