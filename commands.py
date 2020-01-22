@@ -172,9 +172,16 @@ def _use(location, stack, inventory, *args):
     if not item_obj.is_usable:
         stack.append("There was no way you could do that.")
         return location
+    if item_obj.used:
+        stack.append("You remembered that you already did that.")
+        return location
     if target is None:
+        if len(item_obj.usable_with) > 0:
+            stack.append(
+                f"You were sure that there was something you could do with the {item_obj.name}, but you needed a different tool.")
+            return location
         stack.append(f"You used the {item_obj.name}.")
-        # TODO: Add the interact function here.
+        item_obj.used = True
         return location
 
     try:
@@ -187,6 +194,6 @@ def _use(location, stack, inventory, *args):
         stack.append(
             f"You tried using your {target_obj.name}, but it didn't work.")
         return location
-    # TODO: Add the interact function here.
+    item_obj.used = True
     stack.append(f"You used your {target_obj.name} with the {item_obj.name}.")
     return location

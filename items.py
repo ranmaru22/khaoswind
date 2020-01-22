@@ -16,6 +16,7 @@ class Item(object):
         self.allow_pickup = allow_pickup
         self.is_usable = is_usable
         self.usable_with = list()
+        self.used = False
         self.location = location
 
         # Upon creation, the new location object will automatically
