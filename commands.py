@@ -49,21 +49,17 @@ def parser(cmd, location, inventory, locations, items, npcs, stack):
     return location
 
 
-def _consolidate_directions(cmd):
+def _shorten_direction(cmd):
     """Matches equivalent movement commands."""
-    if cmd == 'north':
-        return 'n'
-    elif cmd == 'east':
-        return 'e'
-    elif cmd == 'south':
-        return 's'
-    elif cmd == 'west':
-        return 'w'
-    elif cmd == 'outside':
-        return 'out'
-    elif cmd == 'inside':
-        return 'in'
-    return cmd
+    shorts = {
+        'north': 'n',
+        'east': 'e',
+        'south': 's',
+        'west': 'w',
+        'outside': 'out',
+        'inside': 'in'
+    }
+    return shorts.get(cmd, cmd)
 
 
 def _system_exit():
@@ -138,7 +134,7 @@ def _change_loc(location, direction, stack):
     if direction is None:
         stack.append("Where did you want to go again?")
         return location
-    direction = _consolidate_directions(direction)
+    direction = _shorten_direction(direction)
     return location.move(location, direction, stack)
 
 
