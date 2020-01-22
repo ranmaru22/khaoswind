@@ -27,14 +27,25 @@ class Location(object):
         self.description = None
         self.prompt = "What did you do next?"
 
-    # Methods to add properties to the location.
-    # These don't return output!
+    def _get_opposite(self, direction):
+        """Returns the opposite direction for creating two-way links."""
+        pairs = {
+            'n': 's',
+            'e': 'w',
+            's': 'n',
+            'w': 'e',
+            'in': 'out',
+            'out': 'in'
+        }
+        return pairs.get(direction, None)
+
     def add_link(self, direction, location_obj):
         """Creates a link to a target location."""
         self.adj[direction] = location_obj
         self.allowed_movements.append(direction)
+        location_obj.adj[self._get_opposite(direction)] = self
+        location_obj.allowed_movements.append(self._get_opposite(direction))
 
-    # Method to change the default prompt.
     def ch_prompt(self, prompt):
         """Changes the location's prompt."""
         self.prompt = prompt

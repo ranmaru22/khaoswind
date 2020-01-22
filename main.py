@@ -38,12 +38,15 @@ class TransparentBlue(object):
         """Initializes the game's location objects."""
         # Main Locations
         rooms = [
-            # loc.Location('1-1'),
-            # loc.Location('1-2'),
-            # loc.Location('2-1'),
+            loc.Location('1-1'),
+            loc.Location('1-2'),
+            loc.Location('2-1'),
             loc.Location('2-2')
         ]
         # Create links
+        for room in rooms:
+            room.add_link(random.choice('nesw'),
+                          random.choice(rooms))
         return rooms
 
     def init_items(self):
