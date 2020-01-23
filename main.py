@@ -23,7 +23,11 @@ class TransparentBlue(object):
         self.items = self.init_items()
         self.npcs = self.init_npcs()
         self.inventory = inv.Inventory()
-        self.current_loc = random.choice(self.locations)
+        self.current_loc = self.locations[0]  # random.choice(self.locations)
+
+        # Fill the map.
+        for room in self.locations:
+            room.generate_links(self.locations)
 
         # Set the prompt for the title screen.
         self.prompt = "Press Enter so start the game ..."
@@ -41,15 +45,25 @@ class TransparentBlue(object):
         room_grid_size = 9  # TODO: Variable grid sizes.
         rooms = list()
         with open('internals/loc_descriptions.json') as f_obj:
-            get_room = json.load(f_obj)
-            for i in range(room_grid_size):
-                new_room = get_room.popitem()
-                rooms.append(loc.Location(new_room[0]))
+            all_rooms = json.load(f_obj)
+            for room in all_rooms:
+                rooms.append(loc.Location(room[0]))
         # Creating random links between rooms.
-        for room in rooms:
-            pick_from = [r for r in rooms if r != room]
-            links = [l for l in 'nesw' if l not in room.adj]
-            room.add_link(random.choice(links), random.choice(pick_from))
+        for i, room in enumerate(rooms):
+            link = random.choice([l for l in 'nesw' if l not in room.adj])
+            try:
+                room.add_link(link, rooms[i+1])
+            except IndexError:
+                continue
+            x, y = room.x, room.y
+            if link == 'n':
+                rooms[i+1].set_coords(x, y+1)
+            elif link == 'e':
+                rooms[i+1].set_coords(x+1, y)
+            elif link == 's':
+                rooms[i+1].set_coords(x, y-1)
+            elif link == 'w':
+                rooms[i+1].set_coords(x-1, y)
         return rooms
 
     def init_items(self):
@@ -91,6 +105,7 @@ class TransparentBlue(object):
             print()
             print("DEBUG: Initialized rooms:", [
                   l.name for l in self.locations])
+            print(self.current_loc.x, self.current_loc.y)
             self.stack.print_stack()
 
             # Print the prompt and wait for player input

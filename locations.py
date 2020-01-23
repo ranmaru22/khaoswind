@@ -1,6 +1,7 @@
 """The locations of the game."""
 
 import json
+import math
 
 # Load the location descriptions.
 with open("internals/loc_descriptions.json") as f_obj:
@@ -17,6 +18,8 @@ class Location(object):
         """Initializes the base variables."""
         self.name = name
         self.status = 0
+        self.x = 0
+        self.y = 0
 
         # Relative locations and allowed movements
         self.adj = dict()
@@ -45,6 +48,26 @@ class Location(object):
         self.allowed_movements.append(direction)
         location_obj.adj[self._get_opposite(direction)] = self
         location_obj.allowed_movements.append(self._get_opposite(direction))
+
+    def set_coords(self, x, y):
+        """Sets the location coordinates."""
+        self.x = x
+        self.y = y
+
+    def generate_links(self, loc_map):
+        """Generates links based on a list of locations with coordinates."""
+        for room in loc_map:
+            if room in self.adj.values():
+                continue
+            if math.hypot(self.x - room.x, self.y - room.y) == 1.0:
+                if self.x > room.x:
+                    self.add_link('w', room)
+                elif self.x < room.x:
+                    self.add_link('e', room)
+                elif self.y > room.y:
+                    self.add_link('s', room)
+                elif self.y < room.y:
+                    self.add_link('n', room)
 
     def ch_prompt(self, prompt):
         """Changes the location's prompt."""
