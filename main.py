@@ -4,6 +4,7 @@
 import os
 import time
 import random
+import json
 
 import commands as com
 import locations as loc
@@ -37,20 +38,22 @@ class TransparentBlue(object):
     def init_locations(self):
         """Initializes the game's location objects."""
         # Main Locations
-        rooms = [
-            loc.Location('1-1'),
-            loc.Location('1-2'),
-            loc.Location('2-1'),
-            loc.Location('2-2')
-        ]
-        # Create links
+        room_grid_size = 9  # TODO: Variable grid sizes.
+        rooms = list()
+        with open('internals/loc_descriptions.json') as f_obj:
+            get_room = json.load(f_obj)
+            for i in range(room_grid_size):
+                new_room = get_room.popitem()
+                rooms.append(loc.Location(new_room[0]))
+        # Creating random links between rooms.
         for room in rooms:
-            room.add_link(random.choice('nesw'),
-                          random.choice(rooms))
+            pick_from = [r for r in rooms if r != room]
+            links = [l for l in 'nesw' if l not in room.adj]
+            room.add_link(random.choice(links), random.choice(pick_from))
         return rooms
 
     def init_items(self):
-        """Initializes items at their default locations."""
+        """Initializes items at random locations."""
         items = [
             itm.Item('stick', random.choice(self.locations), True),
             itm.Item('foo', random.choice(self.locations), False, True),
@@ -60,7 +63,7 @@ class TransparentBlue(object):
         return items
 
     def init_npcs(self):
-        """Initializes NPCs in their locations."""
+        """Initializes NPCs at random locations."""
         npcs = [
             npc.NPC('sample', random.choice(self.locations))
         ]
@@ -86,6 +89,8 @@ class TransparentBlue(object):
         while True:
             # Print all info from the stack.
             print()
+            print("DEBUG: Initialized rooms:", [
+                  l.name for l in self.locations])
             self.stack.print_stack()
 
             # Print the prompt and wait for player input
