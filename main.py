@@ -43,7 +43,7 @@ class TransparentBlue(object):
     def init_locations(self):
         """Initializes the game's location objects."""
         # Main Locations
-        room_grid_size = 16  # TODO: Variable grid sizes.
+        room_grid_size = 9  # TODO: Variable grid sizes.
         rooms = list()
         with open('internals/loc_descriptions.json') as f_obj:
             all_rooms = json.load(f_obj)
@@ -106,7 +106,6 @@ class TransparentBlue(object):
             print()
             print(self.current_loc.name, "@",
                   (self.current_loc.x, self.current_loc.y))
-            gf.draw_map(self.locations)
             self.stack.print_stack()
 
             # Print the prompt and wait for player input

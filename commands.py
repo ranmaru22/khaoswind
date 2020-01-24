@@ -2,6 +2,8 @@
 
 import unicodedata
 
+import game_functions as gf
+
 
 def parser(cmd, location, inventory, locations, items, npcs, stack):
     """New version."""
@@ -18,6 +20,8 @@ def parser(cmd, location, inventory, locations, items, npcs, stack):
         return _print_help(location)
     if cmd in ['i', 'inv', 'inventory']:
         return _show_inventory(location, inventory, stack)
+    if cmd in ['m', ',map']:
+        return _print_map(location, locations)
     if cmd in directions:
         return _change_loc(location, cmd, stack)
 
@@ -78,6 +82,12 @@ def _print_help(location):
     print(
         "Available commands: LOOK (AT), GO, TAKE, TALK TO, I[NVENTORY], Q[UIT]")
     print("You can also just enter a direction to go there.")
+    return location
+
+
+def _print_map(location, locations):
+    """DEBUG METHOD: Shows the room map."""
+    gf.draw_map(location, locations)
     return location
 
 

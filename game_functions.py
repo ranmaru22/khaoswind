@@ -12,24 +12,18 @@ def print_speak(text):
         time.sleep(0.025)
 
 
-def draw_map(loc_map):
+def draw_map(current_loc, loc_map):
     """Draws a map based on a list of RG locations."""
     coordinates = [(loc.x, loc.y) for loc in loc_map]
-    x_coords = [x for x, y in coordinates]
-    y_coords = [y for x, y in coordinates]
-    x_max, y_max = max(x_coords), max(y_coords)
-    x_min, y_min = min(x_coords), min(y_coords)
-    abs_max = max(map(abs, (x_max, y_max, x_min, y_min)))
-    abs_min = -abs_max
-
     print(coordinates)
-    print(abs_max, abs_min)
 
-    for y in range(abs_max, abs_min, -1):
+    for y in range(5, -5, -1):
         print()
-        for x in range(abs_min, abs_max):
-            if (x, y) == (0, 0):
+        for x in range(-9, 9):
+            if (x, y) == (current_loc.x, current_loc.y):
                 print('X', end='')
+            elif (x, y) == (0, 0):
+                print('0', end='')
             elif (x, y) in coordinates:
                 print('#', end='')
             else:
