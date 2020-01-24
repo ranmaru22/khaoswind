@@ -12,6 +12,7 @@ import stack as st
 import inventory as inv
 import items as itm
 import npcs as npc
+import game_functions as gf
 
 
 class TransparentBlue(object):
@@ -103,9 +104,8 @@ class TransparentBlue(object):
         while True:
             # Print all info from the stack.
             print()
-            print("DEBUG: Initialized rooms:", [
-                  l.name for l in self.locations])
             print(self.current_loc.x, self.current_loc.y)
+            gf.draw_map(self.locations)
             self.stack.print_stack()
 
             # Print the prompt and wait for player input
