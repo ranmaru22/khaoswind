@@ -23,7 +23,7 @@ def parser(cmd, location, inventory, locations, items, npcs, stack):
     if cmd in ['m', ',map']:
         return _print_map(location, locations)
     if cmd in directions:
-        return _change_loc(location, cmd, stack)
+        return _change_loc(location, locations, cmd, stack)
 
     # Split player's input into command and argument.
     cmd_split = cmd.rsplit(' ', 1)
@@ -36,7 +36,7 @@ def parser(cmd, location, inventory, locations, items, npcs, stack):
     if func in ['look', 'look at']:
         return _look(location, items, npcs, stack, target)
     if func in ['go']:
-        return _change_loc(location, target, stack)
+        return _change_loc(location, locations, target, stack)
     if func in ['take']:
         return _take(location, items, inventory, stack, target)
     if func in ['talk', 'talk to']:
@@ -139,13 +139,13 @@ def _take(location, items, inventory, stack, *args):
     return location
 
 
-def _change_loc(location, direction, stack):
+def _change_loc(location, loc_map, direction, stack):
     """Invokes a location change."""
     if direction is None:
         stack.append("Where did you want to go again?")
         return location
     direction = _shorten_direction(direction)
-    return location.move(location, direction, stack)
+    return location.move(loc_map, direction, stack)
 
 
 def _talk(location, npcs, stack, *args):

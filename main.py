@@ -26,10 +26,6 @@ class TransparentBlue(object):
         self.inventory = inv.Inventory()
         self.current_loc = self.locations[0]  # random.choice(self.locations)
 
-        # Fill the map.
-        for room in self.locations:
-            room.generate_links(self.locations)
-
         # Set the prompt for the title screen.
         self.prompt = "Press Enter so start the game ..."
 
@@ -50,21 +46,24 @@ class TransparentBlue(object):
             for room in all_rooms:
                 rooms.append(loc.Location(room[0]))
         # Creating random links between rooms.
-        for i, room in enumerate(rooms):
-            link = random.choice([l for l in 'nesw' if l not in room.adj])
-            try:
-                room.add_link(link, rooms[i+1])
-            except IndexError:
-                continue
-            x, y = room.x, room.y
-            if link == 'n':
-                rooms[i+1].set_coords(x, y+1)
-            elif link == 'e':
-                rooms[i+1].set_coords(x+1, y)
-            elif link == 's':
-                rooms[i+1].set_coords(x, y-1)
-            elif link == 'w':
-                rooms[i+1].set_coords(x-1, y)
+        x, y = 0, 0
+        for room in rooms:
+            all_links = [(r.x, r.y) for r in rooms]
+            loc_set = False
+            while not loc_set:
+                link = random.choice('nesw')
+                if link == 'n' and (x, y+1) not in all_links:
+                    room.set_coords(x, y+1)
+                elif link == 'e' and (x+1, y) not in all_links:
+                    room.set_coords(x+1, y)
+                elif link == 's' and (x, y-1) not in all_links:
+                    room.set_coords(x, y-1)
+                elif link == 'w' and (x-1, y) not in all_links:
+                    room.set_coords(x-1, y)
+                else:
+                    continue
+                x, y = room.x, room.y
+                loc_set = True
         return rooms
 
     def init_items(self):

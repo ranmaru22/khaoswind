@@ -21,10 +21,6 @@ class Location(object):
         self.x = 0
         self.y = 0
 
-        # Relative locations and allowed movements
-        self.adj = dict()
-        self.allowed_movements = list()
-
         # Upon creation, the new location object will automatically
         # pull the base description from loc_descriptions.json.
         self.description = None
@@ -42,32 +38,10 @@ class Location(object):
         }
         return pairs.get(direction, None)
 
-    def add_link(self, direction, location_obj):
-        """Creates a link to a target location."""
-        self.adj[direction] = location_obj
-        self.allowed_movements.append(direction)
-        location_obj.adj[self._get_opposite(direction)] = self
-        location_obj.allowed_movements.append(self._get_opposite(direction))
-
     def set_coords(self, x, y):
         """Sets the location coordinates."""
         self.x = x
         self.y = y
-
-    def generate_links(self, loc_map):
-        """Generates links based on a list of locations with coordinates."""
-        for room in loc_map:
-            if room in self.adj.values():
-                continue
-            if math.hypot(self.x - room.x, self.y - room.y) == 1.0:
-                if self.x > room.x:
-                    self.add_link('w', room)
-                elif self.x < room.x:
-                    self.add_link('e', room)
-                elif self.y > room.y:
-                    self.add_link('s', room)
-                elif self.y < room.y:
-                    self.add_link('n', room)
 
     def ch_prompt(self, prompt):
         """Changes the location's prompt."""
@@ -141,17 +115,34 @@ class Location(object):
             text = "You saw nothing interesting."
         return text
 
-    def move(self, current_loc, direction, stack):
+    def move(self, loc_map, direction, stack):
         """Reaction to 'go' commands.
         Moves to an adjacent location in the target direction. The method
         returns the location object that lies in that direction.
         """
         # If no location is in the target direction, return a comment.
-        if direction not in self.allowed_movements:
+        coordinates = [(loc.x, loc.y) for loc in loc_map]
+        pos_x, pos_y = self.x, self.y
+        mov_x, mov_y = self._parse_direction(direction)
+        if (self.x + mov_x, self.y + mov_y) not in coordinates:
             stack.append("There is nothing in this direction.")
-            return current_loc
+            return self
         # Else set the current location to the new object and push its
         # description onto the stack.
-        current_loc = self.adj[direction]
-        stack.append(current_loc.get_desc())
-        return current_loc
+        target_loc = [loc for loc in loc_map if loc.x ==
+                      self.x + mov_x and loc.y == self.y + mov_y]
+        if len(target_loc) > 1:
+            raise Exception("More than one location with those coordinates.")
+        stack.append(target_loc[0].get_desc())
+        return target_loc[0]
+
+    def _parse_direction(self, direction):
+        """Returns coordinate changes for a given direction."""
+        dirs = {
+            'n': (0, 1),
+            'e': (1, 0),
+            's': (0, -1),
+            'w': (-1, 0)
+        }
+        x, y = dirs.get(direction, None)
+        return x, y
