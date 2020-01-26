@@ -1,5 +1,5 @@
 {
-  "stick": ["A small stick. It does not look very useful."],
-  "foo": ["Debug item."],
-  "oogie": ["Debug item."]
+  "stick": ["small, wooden", "A small stick. It does not look very useful."],
+  "foo": ["", "Debug item."],
+  "oogie": ["", "Debug item."]
 }

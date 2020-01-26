@@ -12,7 +12,6 @@ class Item(object):
 
     def __init__(self, name, location, allow_pickup=False, is_usable=False, usable_with=[]):
         self.name = name
-        self.status = 0
         self.location = location
         self.allow_pickup = allow_pickup
         self.is_usable = is_usable
@@ -26,7 +25,8 @@ class Item(object):
 
     def _get_desc(self):
         """Gets the items's description text from item_descriptions.json."""
-        self.description = item_descriptions[self.name][self.status]
+        self.adjectives = item_descriptions[self.name][0]
+        self.description = item_descriptions[self.name][1]
 
     def pick_up(self, inventory, location, stack):
         """Adds the item to the player's inventory and removes it from the
