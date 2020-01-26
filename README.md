@@ -1,6 +1,4 @@
-# K.haosPrinz und Wind-Prinzessin
-
-**(Chaos Prince and Wind Princess)**
+# Winds of K.haos
 
 This is a small text adventure game I am building to practice Python.
 The main purpose of this game is to test some concepts, so playability
