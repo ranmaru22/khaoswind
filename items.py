@@ -103,11 +103,12 @@ class Blocker(Item):
     def _resolve(self):
         """Removes the blocker and opens the way."""
         self.blocks.clear()
+        self.location = None
 
     def use(self, other_item, inventory, stack):
         """Uses an item to resolve the blocker."""
         if self.used:
-            return f"The {self.name} is already open."
+            return None
         if other_item is None:
             return f"You need a tool for that."
         elif other_item not in self.usable_with:
