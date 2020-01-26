@@ -13,6 +13,7 @@ import inventory as inv
 import items as itm
 import npcs as npc
 import game_functions as gf
+import settings as stt
 
 
 class TransparentBlue(object):
@@ -20,11 +21,9 @@ class TransparentBlue(object):
 
     def __init__(self):
         # Initalize the base variables.
-        self.locations = self.init_locations()
-        self.items = self.init_items()
-        self.npcs = self.init_npcs()
+        self.settings = stt.Settings()
         self.inventory = inv.Inventory()
-        self.current_loc = self.locations[0]  # random.choice(self.locations)
+        self.current_loc = None
 
         # Set the prompt for the title screen.
         self.prompt = "Press Enter so start the game ..."
@@ -36,22 +35,37 @@ class TransparentBlue(object):
         # Initialize the stack.
         self.stack = st.Stack()
 
+        # Initialize locations, items, and NPCs
+        self.init_locations()
+        # self.locations = loc.Location.list_locations()
+        self.init_items()
+        self.items = itm.Item.list_items()
+        self.init_npcs()
+        self.npcs = npc.NPC.list_npcs()
+
     def init_locations(self):
         """Initializes the game's location objects."""
-        # Main Locations
-        room_grid_size = 9  # TODO: Variable grid sizes.
-        rooms = list()
-        with open('internals/loc_descriptions.json') as f_obj:
-            all_rooms = json.load(f_obj)
-            for room in all_rooms:
-                rooms.append(loc.Location(room[0]))
+
+        # room_grid_size = 2  # TODO: Variable grid sizes.
+        # with open('internals/loc_descriptions.json') as f_obj:
+        #     all_rooms = json.load(f_obj)
+        #     for room in all_rooms:
+        #         x_room = loc.Location(room)
+        #         room_grid_size -= 1
+        #         if room_grid_size == 0:
+        #             break
+        room1 = loc.Location("Entrance Room")
+        room2 = loc.Location("Large Foyer")
+        self.current_loc = room1
+        self.locations = loc.Location.list_locations()
+
         # Creating random links between rooms.
         x, y = 0, 0
-        for room in rooms:
-            all_links = [(r.x, r.y) for r in rooms]
+        for room in self.locations:
+            all_links = [(r.x, r.y) for r in self.locations]
             loc_set = False
             while not loc_set:
-                link = random.choice('nesw')
+                link = random.choice('n')
                 if link == 'n' and (x, y+1) not in all_links:
                     room.set_coords(x, y+1)
                 elif link == 'e' and (x+1, y) not in all_links:
@@ -64,52 +78,48 @@ class TransparentBlue(object):
                     continue
                 x, y = room.x, room.y
                 loc_set = True
-        return rooms
 
     def init_items(self):
         """Initializes items at random locations."""
-        items = [
-            itm.Item('stick', random.choice(self.locations), True),
-            itm.Item('foo', random.choice(self.locations), False, True),
-            itm.Item('oogie', random.choice(
-                self.locations), False, True, ['stick'])
-        ]
-        return items
+        stick = itm.Item('stick', random.choice(self.locations), True)
+        keys = itm.Item('keys', random.choice(self.locations), True, False)
+        chest = itm.Container('chest', random.choice(
+            self.locations), False, True)
+        gold = itm.Item('gold', None)
+        rubble = itm.Blocker('rubble', random.choice(
+            self.locations), False, True)
+
+        chest.add(gold)
+        chest.set_usable(keys)
+        rubble.set_usable(stick)
+        rubble.block_dir('n')
 
     def init_npcs(self):
         """Initializes NPCs at random locations."""
-        npcs = [
-            npc.NPC('sample', random.choice(self.locations))
-        ]
-        return npcs
-
-    def intro(self):
-        """Plays the intro sequence of the game and gets input."""
-        # self.stack.append
+        all_loc = list(self.locations)
+        sample = npc.NPC('sample', random.choice(all_loc))
 
     def main(self):
         """The main method for running the game."""
         # Show the title screen the first time the game starts.
-        # ! DEBUG MODE: Skipping title screen
-        # os.system('clear')
-        # print(self.logo)
-        # input(self.prompt)
+        os.system('clear')
+        print(self.logo)
+        input(self.prompt)
 
         # Push the start location's description to the stack.
+        self.stack.append(self.current_loc.name, 2)
         self.stack.append(self.current_loc.get_desc())
 
         # Start the main loop
         os.system('clear')
+        print(self.locations)
+        print(self.items)
         while True:
             # Print all info from the stack.
             print()
-            print(self.current_loc.name, "@",
-                  (self.current_loc.x, self.current_loc.y))
             self.stack.print_stack()
 
-            # Print the prompt and wait for player input
-            self.prompt = self.current_loc.prompt
-            print(self.prompt)
+            # Wait for player input.
             cmd = input("> ")
 
             # Process the player's input and add the response to the stack
@@ -120,4 +130,3 @@ class TransparentBlue(object):
 if __name__ == '__main__':
     game = TransparentBlue()
     game.main()
-    # print(game.current_loc.items)

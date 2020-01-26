@@ -4,6 +4,9 @@ import json
 import math
 import random
 
+from items import Blocker
+from stack import Color
+
 # Load the location descriptions.
 with open("internals/loc_descriptions.json") as f_obj:
     loc_descriptions = json.load(f_obj)
@@ -15,6 +18,8 @@ class Location(object):
     so 'n' instead of 'north' and 'in' instead of 'inside'.
     """
 
+    _instances = list()
+
     def __init__(self, name):
         """Initializes the base variables."""
         self.name = name
@@ -25,7 +30,13 @@ class Location(object):
         # Upon creation, the new location object will automatically
         # pull the base description from loc_descriptions.json.
         self.description = None
-        self.prompt = "What did you do next?"
+
+        self._instances.append(self)
+
+    @classmethod
+    def list_locations(cls):
+        """A list of all location objects."""
+        return cls._instances
 
     def _get_opposite(self, direction):
         """Returns the opposite direction for creating two-way links."""
@@ -44,16 +55,12 @@ class Location(object):
         self.x = x
         self.y = y
 
-    def ch_prompt(self, prompt):
-        """Changes the location's prompt."""
-        self.prompt = prompt
-
     def get_desc(self):
         """Gets the locations's description text from loc_descriptions.json."""
-        self.description = loc_descriptions[self.name][self.status]
+        self.description = loc_descriptions[self.name]
         if self.status == 0:
-            self.status += 1
-        return self.description
+            self.status = 1
+            return self.description
 
     # Methods which react to player input.
     # Always return output which then goes to the stack. If they
@@ -73,38 +80,49 @@ class Location(object):
 
         # First, list items.
         for item in items_here:
-            article = 'an' if item.name.startswith(
+            article = 'an' if item.adjectives.startswith(
                 ('a', 'i', 'u', 'e', 'o')) else 'a'
-            text += f"\nThere is {article} {item.name} {random.choice(['here', 'nearby', 'close by'])}."
+            text += f"\nThere is {article} {item.adjectives} {item.name} {random.choice(['here', 'nearby', 'close by'])}."
 
         # Next, list NPCs.
         for npc in npcs_here:
-            text += f"\nYou see {next(iter(npcs_here)).name.capitalize()} {random.choice(['here', 'nearby', 'close by'])}."
+            text += f"\nYou see {npc.name.capitalize()} {random.choice(['standing there', 'walking around', 'nearby'])}."
 
         # Catch-all clause if there is nothing to be seen.
         if not text:
-            text = "You saw nothing interesting."
+            text = "You see nothing interesting."
         return text
 
-    def move(self, loc_map, direction, stack):
+    def move(self, loc_map, items, direction, stack):
         """Reaction to 'go' commands.
         Moves to an adjacent location in the target direction. The method
         returns the location object that lies in that direction.
         """
-        # If no location is in the target direction, return a comment.
+        # If no location is in the target direction ...
         coordinates = [(loc.x, loc.y) for loc in loc_map]
         pos_x, pos_y = self.x, self.y
         mov_x, mov_y = self._parse_direction(direction)
         if (self.x + mov_x, self.y + mov_y) not in coordinates:
             stack.append("There is nothing in this direction.")
             return self
-        # Else set the current location to the new object and push its
-        # description onto the stack.
+
+        # Check whether there's something in the way.
+        blockers = [item for item in items if isinstance(item, Blocker)]
+        if len(blockers) > 0:
+            for blocker in blockers:
+                if blocker.location == self and direction in blocker.blocks:
+                    stack.append(
+                        f"A {blocker.adjectives} {blocker.name} blocks the way.")
+                    return self
+
+        # Else get the coordinates for the target and make the move.
         target_loc = [loc for loc in loc_map if loc.x ==
                       self.x + mov_x and loc.y == self.y + mov_y]
         if len(target_loc) > 1:
             raise Exception("More than one location with those coordinates.")
-        stack.append(target_loc[0].get_desc())
+        stack.append(target_loc[0].name, 2)
+        if target_loc[0].status == 0:
+            stack.append(target_loc[0].get_desc())
         return target_loc[0]
 
     def _parse_direction(self, direction):
