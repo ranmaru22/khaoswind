@@ -5,6 +5,19 @@ import textwrap as tw
 import game_functions as gf
 
 
+class Color(object):
+    PURPLE = '\033[95m'
+    CYAN = '\033[96m'
+    DARKCYAN = '\033[36m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    END = '\033[0m'
+
+
 class Stack(object):
     """The main print stack for the game.
     Every round through the main loop, the stack will be emptied and
@@ -44,6 +57,8 @@ class Stack(object):
             for line in self.wrapper.wrap(item):
                 if type_ == 1:
                     gf.print_speak(line)
+                elif type_ == 2:
+                    print(Color.BOLD + line + Color.END)
                 else:
                     print(line)
-            print('')
+            # print('')
