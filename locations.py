@@ -2,6 +2,7 @@
 
 import json
 import math
+import random
 
 # Load the location descriptions.
 with open("internals/loc_descriptions.json") as f_obj:
@@ -57,6 +58,7 @@ class Location(object):
     # Methods which react to player input.
     # Always return output which then goes to the stack. If they
     # don't return output directly, they call functions which do.
+
     def look(self, items, npcs):
         """Reaction to 'look' command."""
         items_here = list()
@@ -68,48 +70,17 @@ class Location(object):
             if npc.location == self:
                 npcs_here.append(npc)
         text = str()
-        # If there is only one item, return a short string.
-        if len(items_here) == 1:
-            item = next(iter(items_here))
+
+        # First, list items.
+        for item in items_here:
             article = 'an' if item.name.startswith(
                 ('a', 'i', 'u', 'e', 'o')) else 'a'
-            text_items = f"You saw {article} {item.name}. "
-            text += text_items
-        # If there is more than one item, return a string that lists all the
-        # items in a comma-separated sentence.
-        elif len(items_here) > 1:
-            first = True
-            text_items = str()
-            for item in items_here:
-                article = 'an' if item.name.startswith(
-                    ('a', 'i', 'u', 'e', 'o')) else 'a'
-                if first:
-                    text_items += f"You saw {article} {item.name}"
-                    first = False
-                else:
-                    text_items += f", {article} {item.name}"
-            else:
-                text_items = text_items.rsplit(
-                    f', {article}', 1)[0] + f', and {article}' + text_items.rsplit(f', {article}', 1)[-1] + '. '
-            text += text_items
+            text += f"\nThere is {article} {item.name} {random.choice(['here', 'nearby', 'close by'])}."
 
-        # Next, check for NPCs in the same way.
-        if len(npcs_here) == 1:
-            text_npc = f"You saw {next(iter(npcs_here)).name.capitalize()}."
-            text += text_npc
-        elif len(npcs_here) > 1:
-            first = True
-            text_npc = str()
-            for npc in npcs_here:
-                if first:
-                    text_npc += f"{npc.name.capitalize()}"
-                    first = False
-                else:
-                    text_npc += f", {npc.name.capitalize()}"
-            else:
-                text_npc = text_npc.rsplit(
-                    ', ', 1)[0] + ', and ' + text_npc.rsplit(', ', 1)[-1] + ' were standing there.'
-            text += "\n" + text_npc
+        # Next, list NPCs.
+        for npc in npcs_here:
+            text += f"\nYou see {next(iter(npcs_here)).name.capitalize()} {random.choice(['here', 'nearby', 'close by'])}."
+
         # Catch-all clause if there is nothing to be seen.
         if not text:
             text = "You saw nothing interesting."
