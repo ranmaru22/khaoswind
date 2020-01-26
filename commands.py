@@ -8,8 +8,8 @@ import game_functions as gf
 def parser(cmd, location, inventory, locations, items, npcs, stack):
     """New version."""
     # TODO: Run some tests on this before pushing it to master.
-    directions = ['n', 'e', 's', 'w', 'north', 'east', 'south', 'west', 'left',
-                  'right', 'up', 'down', 'inside', 'in', 'outside', 'out']
+    directions = ['n', 'e', 's', 'w', 'north', 'east',
+                  'south', 'west', 'inside', 'in', 'outside', 'out']
     # Ignore case and whitespace.
     cmd = unicodedata.normalize("NFKD", cmd.casefold().strip())
 
@@ -35,13 +35,14 @@ def parser(cmd, location, inventory, locations, items, npcs, stack):
     # Call the appropriate function.
     if func in ['look', 'look at']:
         return _look(location, items, npcs, stack, target)
-    if func in ['go']:
+    if func in ['go', 'go to']:
         return _change_loc(location, locations, target, stack)
     if func in ['take']:
         return _take(location, items, inventory, stack, target)
     if func in ['talk', 'talk to']:
         return _talk(location, npcs, stack, target)
 
+    # Further split the input for the two-argument use command.
     if func.startswith('use'):
         item = None
         if len(func.split()) == 3:
