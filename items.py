@@ -56,14 +56,14 @@ class Item(object):
 
 
 class ContainedItem(Item):
-    """Subclass for items found insider containers."""
+    """Subclass for items found inside containers."""
 
     def __init__(self, name):
         super().__init__(name)
 
 
 class Container(Item):
-    """Subblass for items which contains other items."""
+    """Subblass for items which contain other items."""
 
     def __init__(self, name):
         super().__init__(name)
