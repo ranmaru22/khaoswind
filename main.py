@@ -16,7 +16,7 @@ import game_functions as gf
 import settings as stt
 
 
-class TransparentBlue(object):
+class Main(object):
     """The main class containing the init and run methods."""
 
     def __init__(self):
@@ -36,12 +36,9 @@ class TransparentBlue(object):
         self.stack = st.Stack()
 
         # Initialize locations, items, and NPCs
-        self.init_locations()
-        # self.locations = loc.Location.list_locations()
-        self.init_items()
-        self.items = itm.Item.list_items()
-        self.init_npcs()
-        self.npcs = npc.NPC.list_npcs()
+        self.locations = self.init_locations()
+        self.items = self.init_items()
+        self.npcs = self.init_npcs()
 
     def init_locations(self):
         """Initializes the game's location objects."""
@@ -57,12 +54,11 @@ class TransparentBlue(object):
         room1 = loc.Location("Entrance Room")
         room2 = loc.Location("Large Foyer")
         self.current_loc = room1
-        self.locations = loc.Location.list_locations()
 
         # Creating random links between rooms.
         x, y = 0, 0
-        for room in self.locations:
-            all_links = [(r.x, r.y) for r in self.locations]
+        for room in loc.Location.list_locations():
+            all_links = [(r.x, r.y) for r in loc.Location.list_locations()]
             loc_set = False
             while not loc_set:
                 link = random.choice('n')
@@ -78,6 +74,7 @@ class TransparentBlue(object):
                     continue
                 x, y = room.x, room.y
                 loc_set = True
+        return loc.Location.list_locations()
 
     def init_items(self):
         """Initializes items at random locations."""
@@ -94,10 +91,13 @@ class TransparentBlue(object):
         rubble.set_usable(stick)
         rubble.block_dir('n')
 
+        return itm.Item.list_items()
+
     def init_npcs(self):
         """Initializes NPCs at random locations."""
         all_loc = list(self.locations)
         sample = npc.NPC('sample', random.choice(all_loc))
+        return npc.NPC.list_npcs()
 
     def main(self):
         """The main method for running the game."""
@@ -128,5 +128,5 @@ class TransparentBlue(object):
 
 
 if __name__ == '__main__':
-    game = TransparentBlue()
+    game = Main()
     game.main()
