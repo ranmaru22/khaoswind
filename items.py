@@ -95,6 +95,7 @@ class Blocker(Item):
     def __init__(self, name, location, allow_pickup=False, is_usable=False, usable_with=[], blocks=[]):
         super().__init__(name, location, allow_pickup, is_usable, usable_with)
         self.blocks = blocks
+        self.clear_msg = item_descriptions[self.name][2]
 
     def block_dir(self, direction):
         """Sets the blocker to block access to target direction."""
@@ -115,4 +116,4 @@ class Blocker(Item):
             return f"That cannot use the {other_item.name} here."
         self.used = True
         self._resolve()
-        return f"You unlocked the {self.name} with the {other_item.name}."
+        return f"You {self.clear_msg} the {self.name} with the {other_item.name}."

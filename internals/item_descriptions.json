@@ -3,5 +3,5 @@
   "keys": ["set of brass", "An old key ring with three brass keys."],
   "chest": ["old", "An old chest. Locked with a big padlock."],
   "gold": ["piece of", "A gold nugget. Valuable but probably useless."],
-  "rubble": ["giant pile of", "A big pile of rubble."]
+  "rubble": ["giant pile of", "A big pile of rubble.", "cleared"]
 }
