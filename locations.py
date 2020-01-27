@@ -21,21 +21,17 @@ class Location(object):
     _instances = list()
 
     def __init__(self, name):
-        """Initializes the base variables."""
         self.name = name
         self.status = 0
         self.x = 0
         self.y = 0
 
-        # Upon creation, the new location object will automatically
-        # pull the base description from loc_descriptions.json.
         self.description = None
 
         self._instances.append(self)
 
     @classmethod
     def list_locations(cls):
-        """A list of all location objects."""
         return cls._instances
 
     def _get_opposite(self, direction):
@@ -51,9 +47,11 @@ class Location(object):
         return pairs.get(direction, None)
 
     def set_coords(self, x, y):
-        """Sets the location coordinates."""
         self.x = x
         self.y = y
+
+    def get_coords(self):
+        return self.x, self.y
 
     def get_desc(self):
         """Gets the locations's description text from loc_descriptions.json."""
@@ -62,38 +60,22 @@ class Location(object):
             self.status = 1
             return self.description
 
-    # Methods which react to player input.
-    # Always return output which then goes to the stack. If they
-    # don't return output directly, they call functions which do.
+    def look(self, data_object):
+        items_here = data_object.get_items_in_location(self)
+        npcs_here = data_object.get_npcs_in_location(self)
+        if len(items_here) == 0 and len(npcs_here) == 0:
+            return "You see nothing interesting."
 
-    def look(self, items, npcs):
-        """Reaction to 'look' command."""
-        items_here = list()
-        npcs_here = list()
-        for item in items:
-            if item.location == self:
-                items_here.append(item)
-        for npc in npcs:
-            if npc.location == self:
-                npcs_here.append(npc)
         text = str()
-
-        # First, list items.
         for item in items_here:
             article = 'an' if item.adjectives.startswith(
                 ('a', 'i', 'u', 'e', 'o')) else 'a'
             text += f"\nThere is {article} {item.adjectives} {item.name} {random.choice(['here', 'nearby', 'close by'])}."
-
-        # Next, list NPCs.
         for npc in npcs_here:
             text += f"\nYou see {npc.name.capitalize()} {random.choice(['standing there', 'walking around', 'nearby'])}."
-
-        # Catch-all clause if there is nothing to be seen.
-        if not text:
-            text = "You see nothing interesting."
         return text
 
-    def move(self, loc_map, items, direction, stack):
+    def move(self, data_object, direction):
         """Reaction to 'go' commands.
         Moves to an adjacent location in the target direction. The method
         returns the location object that lies in that direction.

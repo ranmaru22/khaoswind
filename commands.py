@@ -1,11 +1,11 @@
-"""Contains commands and command-related verbtions."""
+"""Contains commands and command-related functions."""
 
 import unicodedata
 
 import game_functions as gf
 
 
-def parser(cmd, location, inventory, locations, items, npcs, stack):
+def parser(cmd, data_object):
     """Parses user commands."""
 
     directions = ['n', 'e', 's', 'w', 'north', 'east',
@@ -13,45 +13,40 @@ def parser(cmd, location, inventory, locations, items, npcs, stack):
     # Ignore case and whitespace.
     cmd = unicodedata.normalize("NFKD", cmd.casefold().strip())
 
-    # Catch system functions.
     if cmd in ['q', 'quit']:
         _system_exit()
     if cmd in ['h', 'help']:
-        return _print_help(location)
+        return _print_help(data_object)
     if cmd in ['i', 'inv', 'inventory']:
-        return _show_inventory(location, inventory, stack)
+        return _show_inventory(data_object)
     if cmd in ['m', ',map']:
-        return _print_map(location, locations)
+        return _print_map(data_object)
     if cmd in directions:
-        return _change_loc(location, locations, items, cmd, stack)
+        return _change_loc(data_object, cmd)
 
     # Split player's input into command and argument.
     cmd_split = cmd.rsplit(' ', 1)
-    if len(cmd_split) == 2:
+    if len(cmd_split) == 2 and cmd_split[0] != 'at':
         verb, obj1 = cmd_split
     else:
         verb, obj1 = cmd_split[0], None
 
-    # Call the appropriate verbtion.
     if verb in ['look', 'look at']:
-        return _look(location, items, npcs, stack, obj1)
+        return _look(data_object, obj1)
     if verb in ['go', 'go to']:
-        return _change_loc(location, locations, obj1, stack)
+        return _change_loc(data_object, obj1)
     if verb in ['take', 'get']:
-        return _take(location, items, inventory, stack, obj1)
+        return _take(data_object, obj1)
     if verb in ['talk', 'talk to']:
-        return _talk(location, npcs, stack, obj1)
-
-    # Further split the input for the two-argument use command.
+        return _talk(data_object, obj1)
     if verb.startswith('use'):
         obj2 = None
         if len(verb.split()) == 3:
             verb, obj2, _ = verb.split()
-        return _use(location, items, inventory, stack, obj1, obj2)
+        return _use(data_object, obj1, obj2)
 
-    # If the player's input matches none of the commands:
     stack.append("Hmm, that didn't work out.")
-    return location
+    return data_object.current_loc
 
 
 def _shorten_direction(cmd):
@@ -69,95 +64,80 @@ def _shorten_direction(cmd):
 
 def _system_exit():
     """Quits the game."""
-    # TODO: ADD ALL THIS BACK IN LATER
-    # TODO: Add a save/load verbtion.
     # r = input("Are you sure? ([y]es/[n]o) ").lower()
     # if r.startswith('y'):
     print('Thank you for playing!')
     raise SystemExit
-    # return??
 
 
-def _print_help(location):
+def _print_help(data_object):
     """Prints available commands."""
     print(
         "Available commands: LOOK (AT), GO, TAKE, TALK TO, I[NVENTORY], Q[UIT]")
     print("You can also just enter a direction to go there.")
-    return location
+    return data_object.current_loc
 
 
-def _print_map(location, locations):
+def _print_map(data_object):
     """DEBUG METHOD: Shows the room map."""
-    gf.draw_map(location, locations)
-    return location
+    data_object.draw_map()
+    return data_object.current_loc
 
 
-def _show_inventory(location, inventory, stack):
+def _show_inventory(data_object):
     """Shows the player's inventory."""
-    stack.append(inventory.check())
-    return location
+    data_object.stack.append(data_object.inventory.check())
+    return data_object.current_loc
 
 
-def _look(location, items, npcs, stack, *args):
+def _look(data_object, obj1):
     """Looks at an item or the location."""
-    if args[0] is not None:
-        obj1 = args[0]
-        # Check whether the player actually named an item.
-        if obj1 == 'at':
-            stack.append("What did you want to look at?")
-            return location
-        # Check whether the item is actually there.
-        item_names = [x.name for x in items]
-        if obj1 in item_names:
-            item = items[item_names.index(obj1)]
-            if item.location == location:
-                stack.append(item.description)
-                return location
-        npc_names = [x.name for x in npcs]
-        if obj1 in npc_names:
-            npc = npcs[npc_names.index(obj1)]
-            if npc.location == location:
-                stack.append(npc.description)
-                return location
-        stack.append(f"There's no {obj1} in sight.")
-        return location
-    # If no argument was sent, inspect the location itself.
-    location.get_desc()
-    stack.append(location.description)
-    stack.append(location.look(items, npcs))
-    return location
+    if obj1 is None:
+        data_object.current_loc.get_desc()
+        data_object.stack.append(data_object.current_loc.description)
+        data_object.stack.append(data_object.current_loc.look(data_object))
+        return data_object.current_loc
+
+    target_item = data_object.get_item_from_name(obj1)
+    if target_item and data_object.is_in_current_location(target_item):
+        stack.append(target_item.description)
+        return data_object.current_loc
+
+    target_npc = data_object.get_npc_names(obj1)
+    if target_npc and data_object.is_in_current_location(target_npc):
+        stack.append(target_npc.description)
+        return data_object.current_loc
+
+    stack.append(f"There's no {obj1} in sight.")
+    return data_object.current_loc
 
 
-def _take(location, items, inventory, stack, *args):
+def _take(data_object, obj1):
     """Picks up an item."""
-    if args[0] is None:
-        stack.append("What do you want to pick up?")
-        return location
-    obj1 = args[0]
-    item_names = [x.name for x in items]
-    if obj1 not in item_names:
-        stack.append("You don't see that anywhere.")
-        return location
-    item = items[item_names.index(obj1)]
-    if item.location != location:
-        stack.append("You don't see that anywhere.")
-        return location
-    if not item.allow_pickup:
-        stack.append("You cannot pick that up.")
-        return location
-    inventory.add(item, location, stack)
-    return location
+    if obj1 is None:
+        data_object.stack.append("What do you want to pick up?")
+        return data_object.current_loc
+    target_item = data_object.get_item_from_name(obj1)
+    if not target_item or not data_object.is_in_current_location(target_item):
+        data_object.stack.append("You don't see that anywhere.")
+        return data_object.current_loc
+    if not target_item.allow_pickup:
+        data_object.stack.append("You cannot pick that up.")
+        return data_object.current_loc
+    data_object.inventory.add(data_object, target_item)
+    return data_object.current_loc
 
 
-def _change_loc(location, loc_map, items, direction, stack):
+def _change_loc(data_object, direction):
     """Invokes a location change."""
     if direction is None:
-        stack.append("Where do you want to go?")
-        return location
+        data_object.stack.append("Where do you want to go?")
+        return data_object.current_loc
     direction = _shorten_direction(direction)
-    return location.move(loc_map, items, direction, stack)
+    return data_object.current_loc.move(data_object, direction)
 
 
+# TODO: Update this function!
 def _talk(location, npcs, stack, *args):
     """Talks to an NPC."""
     if args[0] is None:
@@ -177,25 +157,15 @@ def _talk(location, npcs, stack, *args):
     return location
 
 
-def _use(location, items, inventory, stack, *args):
+def _use(data_object, obj1, obj2):
     """Uses an item, or interacts with something at the location."""
-    if args == (None, None):
-        stack.append("What do you want to use?")
-        return location
-    else:
-        obj1, obj2 = args[0], args[1]
-    try:
-        item_names = [x.name for x in items]
-        obj1_obj = items[item_names.index(obj1)]
-    except ValueError:
-        stack.append(f"There is no {obj1} here.")
-        return location
-    try:
-        obj2_obj = items[item_names.index(obj2)]
-    except ValueError:
-        obj2_obj = None
-    if obj2_obj and obj2_obj.location.name != "Inventory":
-        stack.append(f"You don't have anything like that.")
-        return location
-    stack.append(obj1_obj.use(obj2_obj, inventory, stack))
-    return location
+    if obj1 is None and obj2 is None:
+        data_object.stack.append("What do you want to use?")
+        return data_object.current_loc
+    use_item = data_object.get_item_from_name(obj1)
+    tool_item = data_object.get_item_from_name(obj2)
+    if not use_item or not data_object.is_in_current_location(use_item):
+        data_object.stack.append(f"There is no {obj1} here.")
+        return data_object.current_loc
+    data_object.stack.append(use_item.use(data_object, tool_item))
+    return data_object.current_loc

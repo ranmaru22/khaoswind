@@ -16,9 +16,9 @@ class NPC(object):
 
     _instances = list()
 
-    def __init__(self, name, location):
+    def __init__(self, name):
         self.name = name
-        self.location = location
+        self.location = None
         self.description = None
         self._get_desc()
 
