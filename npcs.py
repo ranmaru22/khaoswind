@@ -33,15 +33,16 @@ class NPC(object):
         """Gets the NPC's description text from npc_descriptions.json."""
         self.description = npc_descriptions[self.name]
 
-    def trigger_conv(self, keyword, stack):
+    def trigger_conv(self, data_object, keyword):
         """Triggers a conversation. Loads the lines from conversations.json and
         pushes them onto the stack.
         """
         if keyword not in conversations[self.name]:
-            stack.append("\"I don't know anything about that ...\"", 1)
+            data_object.stack.append(
+                "\"I don't know anything about that ...\"", 1)
             return
         for line in conversations[self.name][keyword]:
-            stack.append(f'"{line}"', 1)
+            data_object.stack.append(f'"{line}"', 1)
 
     def move(self, loc_map):
         """Moves the NPC to an adjacent location."""

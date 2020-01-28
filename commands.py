@@ -137,24 +137,19 @@ def _change_loc(data_object, direction):
     return data_object.current_loc.move(data_object, direction)
 
 
-# TODO: Update this function!
-def _talk(location, npcs, stack, *args):
+def _talk(data_object, obj1):
     """Talks to an NPC."""
-    if args[0] is None:
-        stack.append("Did you often talk to yourself?")
-        return location
-    obj1 = args[0]
-    # Check whether that NPC is at the player's location.
-    npc_names = [x.name for x in npcs]
-    if obj1 not in npc_names:
-        stack.append("No, there's no one there ...")
-        return location
-    # Ask for a keyword and trigger a conversation.
-    keyword = input("\nWhat was it you asked them?\n> ")
+    if obj1 is None:
+        data_object.stack.append("Who do you want to talk to?")
+        return data_object.current_loc
+    target_npc = data_object.get_npc_from_name(obj1)
+    if not target_npc or not data_object.is_in_current_location(target_npc):
+        data_object.stack.append("There is no one there.")
+        return data_object.current_loc
+    keyword = input(f"\nWhat will you ask {target_npc.name}?\n> ")
     keyword = unicodedata.normalize("NFKD", keyword.casefold().strip())
-    npc = npcs[npc_names.index(obj1)]
-    npc.trigger_conv(keyword, stack)
-    return location
+    target_npc.trigger_conv(data_object, keyword)
+    return data_object.current_loc
 
 
 def _use(data_object, obj1, obj2):
