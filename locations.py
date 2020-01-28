@@ -66,9 +66,9 @@ class Location(object):
         for item in items_here:
             article = 'an' if item.adjectives.startswith(
                 ('a', 'i', 'u', 'e', 'o')) else 'a'
-            text += f"\nThere is {article} {item.adjectives} {item.name} {random.choice(['here', 'nearby', 'close by'])}."
+            text += f"There is {article} {item.adjectives} {item.name} {random.choice(['here', 'nearby', 'close by'])}."
         for npc in npcs_here:
-            text += f"\nYou see {npc.name.capitalize()} {random.choice(['standing there', 'walking around', 'nearby'])}."
+            text += f"You see {npc.name.capitalize()} {random.choice(['standing there', 'walking around', 'nearby'])}."
         return text
 
     # TODO: This method next!!
