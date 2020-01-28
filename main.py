@@ -14,6 +14,7 @@ import items
 import npcs
 import game_functions as gf
 import settings
+import scenes
 
 
 class Main(object):
@@ -33,7 +34,8 @@ class Main(object):
         self.game_data.set_loc_list(self.init_locations())
         self.game_data.set_item_list(self.init_items())
         self.game_data.set_npc_list(self.init_npcs())
-        self.game_data.set_current_loc(self.game_data.get_random_location())
+        self.game_data.set_current_loc(
+            self.game_data.get_loc_from_name("Entrance Room"))
 
         stick = self.game_data.get_item_from_name('stick')
         stick.set_pickup_allowed()
@@ -55,10 +57,11 @@ class Main(object):
             self.logo = f_obj.read()
 
     def init_locations(self):
-        loc_list = [loc.Location("Entrance Room"),
-                    loc.Location("Large Foyer"),
-                    loc.Location("Debris Room")
-                    ]
+        with open("internals/loc_descriptions.json") as f_obj:
+            loc_iterator = json.load(f_obj)
+        loc_list = list()
+        for next_loc in loc_iterator:
+            loc_list.append(loc.Location(next_loc))
         return loc_list
 
     def init_items(self):
@@ -71,7 +74,7 @@ class Main(object):
         return item_list
 
     def init_npcs(self):
-        npc_list = [npcs.NPC('sample')]
+        npc_list = [npcs.NPC('test name')]
         return npc_list
 
     def main(self):
@@ -83,8 +86,8 @@ class Main(object):
         self.game_data.stack.append(self.game_data.current_loc.get_desc())
 
         self.clear_screen()
-        print(self.game_data.locations)
-        print(self.game_data.items)
+        intro = scenes.Scene("intro", self.game_data.current_loc)
+        intro.play()
 
         while True:
             print()
