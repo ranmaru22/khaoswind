@@ -28,15 +28,17 @@ class Main(object):
         self.game_data.set_npc_list(self.init_npcs())
         self.game_data.set_current_loc(self.game_data.get_random_location())
 
-        self.game_data.get_item_from_name('stick').set_pickup_allowed()
-        self.game_data.get_item_from_name('keys').set_pickup_allowed()
-        self.game_data.get_item_from_name('chest').add_contents(
-            self.game_data.get_item_from_name('gold'))
-        self.game_data.get_item_from_name('chest').set_usable_with(
-            self.game_data.get_item_from_name('keys'))
-        self.game_data.get_item_from_name('rubble').set_usable_with(
-            self.game_data.get_item_from_name('stick'))
-        self.game_data.get_item_from_name('rubble').set_block_dir('n')
+        stick = self.game_data.get_item_from_name('stick')
+        stick.set_pickup_allowed()
+        keys = self.game_data.get_item_from_name('keys')
+        keys.set_pickup_allowed()
+        chest = self.game_data.get_item_from_name('chest')
+        gold = self.game_data.get_item_from_name('gold')
+        chest.add_contents(gold)
+        chest.set_usable_with(keys)
+        rubble = self.game_data.get_item_from_name('rubble')
+        rubble.set_usable_with(stick)
+        rubble.set_block_dir('n')
 
         self.game_data.create_map()
         self.game_data.distribute_items()
@@ -47,7 +49,8 @@ class Main(object):
 
     def init_locations(self):
         loc_list = [loc.Location("Entrance Room"),
-                    loc.Location("Large Foyer")
+                    loc.Location("Large Foyer"),
+                    loc.Location("Debris Room")
                     ]
         return loc_list
 

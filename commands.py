@@ -146,7 +146,7 @@ def _talk(data_object, obj1):
     if not target_npc or not data_object.is_in_current_location(target_npc):
         data_object.stack.append("There is no one there.")
         return data_object.current_loc
-    keyword = input(f"\nWhat will you ask {target_npc.name}?\n> ")
+    keyword = input(f"\nWhat will you ask {target_npc.name.capitalize()}?\n> ")
     keyword = unicodedata.normalize("NFKD", keyword.casefold().strip())
     target_npc.trigger_conv(data_object, keyword)
     return data_object.current_loc
