@@ -60,7 +60,7 @@ class GameData(object):
             coordinates = self.get_coordinates()
             loc_set = False
             while not loc_set:
-                link = random.choice('n')
+                link = random.choice('nesw')
                 if link == 'n' and (x, y+1) not in coordinates:
                     loc.set_coords(x, y+1)
                 elif link == 'e' and (x+1, y) not in coordinates:
@@ -109,10 +109,9 @@ class GameData(object):
     def is_in_inventory(self, obj):
         return obj.location == self.inventory
 
-    # @debug
+    # ! Debug method -- tb removed in final game
     def draw_map(self):
-        coordinates = [(loc.x, loc.y) for loc in self.locations]
-        print((self.current_loc.x, self.current_loc.y), end='')
+        coordinates = self.get_coordinates()
         for y in range(5, -5, -1):
             print()
             for x in range(-9, 9):
