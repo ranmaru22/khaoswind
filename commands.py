@@ -45,7 +45,7 @@ def parser(cmd, data_object):
             verb, obj2, _ = verb.split()
         return _use(data_object, obj1, obj2)
 
-    stack.append("Hmm, that didn't work out.")
+    data_object.stack.append("Hmm, that didn't work out.")
     return data_object.current_loc
 
 
@@ -99,16 +99,16 @@ def _look(data_object, obj1):
         return data_object.current_loc
 
     target_item = data_object.get_item_from_name(obj1)
-    if target_item and data_object.is_in_current_location(target_item):
-        stack.append(target_item.description)
+    if target_item and (data_object.is_in_current_location(target_item) or data_object.is_in_inventory(target_item)):
+        data_object.stack.append(target_item.description)
         return data_object.current_loc
 
-    target_npc = data_object.get_npc_names(obj1)
+    target_npc = data_object.get_npc_from_name(obj1)
     if target_npc and data_object.is_in_current_location(target_npc):
-        stack.append(target_npc.description)
+        data_object.stack.append(target_npc.description)
         return data_object.current_loc
 
-    stack.append(f"There's no {obj1} in sight.")
+    data_object.stack.append(f"There's no {obj1} in sight.")
     return data_object.current_loc
 
 
