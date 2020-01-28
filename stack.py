@@ -26,13 +26,12 @@ class Stack(object):
     the game prompts the player for another command.
     """
 
+    _wrapper = tw.TextWrapper(width=80, replace_whitespace=False)
+
     def __init__(self):
         # Start with an empty stack.
         self.items = list()
         self.item_types = list()
-
-        # Initialize the TextWrapper object.
-        self.wrapper = tw.TextWrapper(width=80, replace_whitespace=False)
 
     def append(self, item, type_=0):
         """Add an item to the stack.
@@ -42,19 +41,17 @@ class Stack(object):
         self.item_types.append(type_)
 
     def pop(self):
-        """Pops the last item off the stack and returns it."""
         last = self.items.pop()
         _ = self.item_types.pop()
         return last
 
     def print_stack(self):
-        """Empties the stack and prints all the items on it."""
         self.items.reverse()
         self.item_types.reverse()
         while self.items:
             item = self.items.pop()
             type_ = self.item_types.pop()
-            for line in self.wrapper.wrap(item):
+            for line in self._wrapper.wrap(item):
                 if type_ == 1:
                     gf.print_speak(line)
                 elif type_ == 2:
