@@ -14,6 +14,9 @@ class Inventory(object):
         item.location = self
         self.items.append(item)
 
+    def get_items(self):
+        return [i for i in self.items]
+
     def check(self):
         if self.is_empty():
             return "Your pockets are empty."
