@@ -4,7 +4,7 @@ import sys
 import time
 import random
 
-from items import ContainedItem
+from items import ContainedItem, Blocker
 
 
 class GameData(object):
@@ -57,7 +57,7 @@ class GameData(object):
     def create_map(self):
         x, y = 0, 0
         for loc in self.locations:
-            coordinates = [(loc.x, loc.y) for loc in self.locations]
+            coordinates = self.get_coordinates()
             loc_set = False
             while not loc_set:
                 link = random.choice('n')
@@ -73,6 +73,23 @@ class GameData(object):
                     continue
                 x, y = loc.get_coords()
                 loc_set = True
+
+    def get_coordinates(self):
+        return [(loc.x, loc.y) for loc in self.locations]
+
+    def get_loc_from_coordinates(self, x, y):
+        target_loc = [loc for loc in self.locations if (
+            loc.x, loc.y) == (x, y)]
+        if len(target_loc) > 1:
+            raise Exception("More than one location with same coordinates.")
+        return target_loc[0] if len(target_loc) == 1 else None
+
+    def is_blocked(self, direction):
+        blockers = self.get_blockers()
+        return any(map(lambda x: direction in x.blocked_directions, blockers))
+
+    def get_blockers(self):
+        return [b for b in self.items if isinstance(b, Blocker) and self.is_in_current_location(b)]
 
     def distribute_items(self):
         self.add_to_random_location(self.items)

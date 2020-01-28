@@ -75,37 +75,31 @@ class Location(object):
             text += f"\nYou see {npc.name.capitalize()} {random.choice(['standing there', 'walking around', 'nearby'])}."
         return text
 
+    # TODO: This method next!!
+
     def move(self, data_object, direction):
-        """Reaction to 'go' commands.
-        Moves to an adjacent location in the target direction. The method
-        returns the location object that lies in that direction.
-        """
-        # If no location is in the target direction ...
-        coordinates = [(loc.x, loc.y) for loc in loc_map]
-        pos_x, pos_y = self.x, self.y
-        mov_x, mov_y = self._parse_direction(direction)
-        if (self.x + mov_x, self.y + mov_y) not in coordinates:
-            stack.append("There is nothing in this direction.")
+        """Moves to an adjacent location in the target direction."""
+        # Check for blockers.
+        if data_object.is_blocked(direction):
+            blockers = data_object.get_blockers()
+            text = str()
+            for blocker in blockers:
+                if direction in blocker.blocked_directions:
+                    text += f"A {blocker.adjectives} {blocker.name} blocks the way."
+            data_object.stack.append(text)
             return self
 
-        # Check whether there's something in the way.
-        blockers = [item for item in items if isinstance(item, Blocker)]
-        if len(blockers) > 0:
-            for blocker in blockers:
-                if blocker.location == self and direction in blocker.blocks:
-                    stack.append(
-                        f"A {blocker.adjectives} {blocker.name} blocks the way.")
-                    return self
-
-        # Else get the coordinates for the target and make the move.
-        target_loc = [loc for loc in loc_map if loc.x ==
-                      self.x + mov_x and loc.y == self.y + mov_y]
-        if len(target_loc) > 1:
-            raise Exception("More than one location with those coordinates.")
-        stack.append(target_loc[0].name, 2)
-        if target_loc[0].status == 0:
-            stack.append(target_loc[0].get_desc())
-        return target_loc[0]
+        delta_x, delta_y = self._parse_direction(direction)
+        target_loc = data_object.get_loc_from_coordinates(
+            self.x + delta_x, self.y + delta_y)
+        if target_loc is None:
+            data_object.stack.append("There is nothing in this direction.")
+            return self
+        data_object.stack.append(target_loc.name, 2)
+        if target_loc.status == 0:
+            data_object.stack.append(target_loc.get_desc())
+        data_object.set_current_loc(target_loc)
+        return target_loc
 
     def _parse_direction(self, direction):
         """Returns coordinate changes for a given direction."""
