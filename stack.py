@@ -58,4 +58,4 @@ class Stack(object):
                     print(Color.BOLD + line + Color.END)
                 else:
                     print(line)
-            # print('')
+            print('')
