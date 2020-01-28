@@ -6,10 +6,9 @@ import game_functions as gf
 
 
 def parser(cmd, data_object):
-    """Parses user commands."""
-
     directions = ['n', 'e', 's', 'w', 'north', 'east',
                   'south', 'west', 'inside', 'in', 'outside', 'out']
+
     # Ignore case and whitespace.
     cmd = unicodedata.normalize("NFKD", cmd.casefold().strip())
 
@@ -24,7 +23,7 @@ def parser(cmd, data_object):
     if cmd in directions:
         return _change_loc(data_object, cmd)
 
-    # Split player's input into command and argument.
+    # Split input into command and argument.
     cmd_split = cmd.rsplit(' ', 1)
     if len(cmd_split) == 2 and cmd_split[0] != 'at':
         verb, obj1 = cmd_split
@@ -50,7 +49,6 @@ def parser(cmd, data_object):
 
 
 def _shorten_direction(cmd):
-    """Matches equivalent movement commands."""
     shorts = {
         'north': 'n',
         'east': 'e',
@@ -63,7 +61,6 @@ def _shorten_direction(cmd):
 
 
 def _system_exit():
-    """Quits the game."""
     # r = input("Are you sure? ([y]es/[n]o) ").lower()
     # if r.startswith('y'):
     print('Thank you for playing!')
@@ -71,7 +68,6 @@ def _system_exit():
 
 
 def _print_help(data_object):
-    """Prints available commands."""
     print(
         "Available commands: LOOK (AT), GO, TAKE, TALK TO, I[NVENTORY], Q[UIT]")
     print("You can also just enter a direction to go there.")
@@ -79,19 +75,16 @@ def _print_help(data_object):
 
 
 def _print_map(data_object):
-    """DEBUG METHOD: Shows the room map."""
     data_object.draw_map()
     return data_object.current_loc
 
 
 def _show_inventory(data_object):
-    """Shows the player's inventory."""
     data_object.stack.append(data_object.inventory.check())
     return data_object.current_loc
 
 
 def _look(data_object, obj1):
-    """Looks at an item or the location."""
     if obj1 is None:
         data_object.current_loc.get_desc()
         data_object.stack.append(data_object.current_loc.description)
@@ -113,7 +106,6 @@ def _look(data_object, obj1):
 
 
 def _take(data_object, obj1):
-    """Picks up an item."""
     if obj1 is None:
         data_object.stack.append("What do you want to pick up?")
         return data_object.current_loc
@@ -129,7 +121,6 @@ def _take(data_object, obj1):
 
 
 def _change_loc(data_object, direction):
-    """Invokes a location change."""
     if direction is None:
         data_object.stack.append("Where do you want to go?")
         return data_object.current_loc
@@ -138,7 +129,6 @@ def _change_loc(data_object, direction):
 
 
 def _talk(data_object, obj1):
-    """Talks to an NPC."""
     if obj1 is None:
         data_object.stack.append("Who do you want to talk to?")
         return data_object.current_loc
@@ -153,7 +143,6 @@ def _talk(data_object, obj1):
 
 
 def _use(data_object, obj1, obj2):
-    """Uses an item, or interacts with something at the location."""
     if obj1 is None and obj2 is None:
         data_object.stack.append("What do you want to use?")
         return data_object.current_loc
