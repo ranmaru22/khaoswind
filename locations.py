@@ -66,10 +66,10 @@ class Location(object):
         for item in items_here:
             article = 'an' if item.adjectives.startswith(
                 ('a', 'i', 'u', 'e', 'o')) else 'a'
-            text += f"There is {article} {item.adjectives} {item.name} {random.choice(['here', 'nearby', 'close by'])}."
+            text += f"There is {article} {item.adjectives} {item.name} {random.choice(['here', 'nearby', 'close by'])}.\n"
         for npc in npcs_here:
-            text += f"You see {npc.name.capitalize()} {random.choice(['standing there', 'walking around', 'nearby'])}."
-        return text
+            text += f"You see {npc.name.capitalize()} {random.choice(['standing there', 'walking around', 'nearby'])}.\n"
+        return text.rstrip()
 
     # TODO: This method next!!
 
@@ -82,8 +82,8 @@ class Location(object):
             if blockers:
                 text = str()
                 for blocker in blockers:
-                    text += f"A {blocker.adjectives} {blocker.name} blocks the way."
-            data_object.stack.append(text)
+                    text += f"A {blocker.adjectives} {blocker.name} blocks the way.\n"
+            data_object.stack.append(text.rstrip())
             return self
 
         delta_x, delta_y = self._parse_direction(direction)
