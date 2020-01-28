@@ -1,8 +1,8 @@
 """The main file for running the game."""
 
 
+import sys
 import os
-import time
 import random
 import json
 
@@ -18,6 +18,13 @@ import settings
 
 class Main(object):
     """The main class containing the init and run methods."""
+
+    @staticmethod
+    def clear_screen():
+        if 'nt' in os.name:
+            os.system('cls')
+        else:
+            os.system('clear')
 
     def __init__(self):
         self.settings = settings.Settings()
@@ -68,15 +75,14 @@ class Main(object):
         return npc_list
 
     def main(self):
-        # Show the title screen the first time the game starts.
-        os.system('clear')
+        self.clear_screen()
         print(self.logo)
         input("Press Enter so start the game ...")
 
         self.game_data.stack.append(self.game_data.current_loc.name, 2)
         self.game_data.stack.append(self.game_data.current_loc.get_desc())
 
-        os.system('clear')
+        self.clear_screen()
         print(self.game_data.locations)
         print(self.game_data.items)
 
