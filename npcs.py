@@ -36,7 +36,7 @@ class NPC(object):
         try:
             conv = self._conversations[self.name][str(self.finished_convs + 1)]
             self.finished_convs += 1
-        except IndexError:
+        except KeyError:
             conv = self._conversations[self.name][str(self.finished_convs)]
         for line in conv:
             data_object.stack.append(f'"{line}"', 1)
