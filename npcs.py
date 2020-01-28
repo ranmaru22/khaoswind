@@ -43,9 +43,3 @@ class NPC(object):
             return
         for line in conversations[self.name][keyword]:
             data_object.stack.append(f'"{line}"', 1)
-
-    def move(self, loc_map):
-        """Moves the NPC to an adjacent location."""
-        x, y = self.location.x, self.location.y
-        targets = [loc for loc in loc_map if loc.x ==
-                   x + mov_x and loc.y == self.y + mov_y]
