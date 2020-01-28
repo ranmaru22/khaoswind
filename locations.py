@@ -77,10 +77,11 @@ class Location(object):
         """Moves to an adjacent location in the target direction."""
         # Check for blockers.
         if data_object.is_blocked(direction):
-            blockers = data_object.get_blockers()
-            text = str()
-            for blocker in blockers:
-                if direction in blocker.blocked_directions:
+            blockers = [b for b in data_object.get_blockers(
+            ) if direction in b.blocked_directions]
+            if blockers:
+                text = str()
+                for blocker in blockers:
                     text += f"A {blocker.adjectives} {blocker.name} blocks the way."
             data_object.stack.append(text)
             return self
