@@ -1,11 +1,7 @@
 """The locations of the game."""
 
 import json
-import math
 import random
-
-from items import Blocker
-from stack import Color
 
 # Load the location descriptions.
 with open("internals/loc_descriptions.json") as f_obj:
