@@ -74,7 +74,7 @@ class Main(object):
         return item_list
 
     def init_npcs(self):
-        npc_list = [npcs.NPC('test name')]
+        npc_list = [npcs.NPC('sample')]
         return npc_list
 
     def main(self):
