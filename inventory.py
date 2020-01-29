@@ -14,8 +14,15 @@ class Inventory(object):
         item.location = self
         self.items.append(item)
 
+    def drop(self, item):
+        if item is in self.items:
+            self.items.remove(item)
+
     def get_items(self):
         return [i for i in self.items]
+
+    def get_item_names(self):
+        return [i.name for i in self.items]
 
     def check(self):
         if self.is_empty():
