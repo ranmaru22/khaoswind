@@ -18,7 +18,7 @@ def parser(cmd, data_object):
         return _print_help(data_object)
     if cmd in ['i', 'inv', 'inventory']:
         return _show_inventory(data_object)
-    if cmd in ['m', ',map']:
+    if cmd in ['m', 'map']:
         if has_map(data_object):
             return _print_map(data_object)
     if cmd in directions:
@@ -150,15 +150,17 @@ def _talk(data_object, obj1):
     return data_object.current_loc
 
 
-# TODO: Make this work with inventory items.
 def _use(data_object, obj1, obj2):
     if obj1 is None and obj2 is None:
         data_object.stack.append("What do you want to use?")
         return data_object.current_loc
     use_item = data_object.get_item_from_name(obj1)
     tool_item = data_object.get_item_from_name(obj2)
-    if not use_item or not data_object.is_in_current_location(use_item):
-        data_object.stack.append(f"There is no {obj1} here.")
+    if use_item and data_object.is_in_current_location(use_item):
+        data_object.stack.append(use_item.use(data_object, tool_item))
         return data_object.current_loc
-    data_object.stack.append(use_item.use(data_object, tool_item))
+    elif use_item and data_object.is_in_inventory(use_item):
+        data_object.stack.append(use_item.use(data_object, tool_item))
+        return data_object.current_loc
+    data_object.stack.append(f"There is no {obj1} here.")
     return data_object.current_loc
