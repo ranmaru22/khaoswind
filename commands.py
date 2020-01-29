@@ -19,7 +19,8 @@ def parser(cmd, data_object):
     if cmd in ['i', 'inv', 'inventory']:
         return _show_inventory(data_object)
     if cmd in ['m', ',map']:
-        return _print_map(data_object)
+        if has_map():
+            return _print_map(data_object)
     if cmd in directions:
         return _change_loc(data_object, cmd)
 
@@ -48,6 +49,11 @@ def parser(cmd, data_object):
     return data_object.current_loc
 
 
+def has_map(data_object):
+    room_map = data_object.get_item_from_name('map')
+    return data_object.inventory.is_in_inventory(room_map)
+
+
 def _shorten_direction(cmd):
     shorts = {
         'north': 'n',
@@ -68,9 +74,13 @@ def _system_exit():
 
 
 def _print_help(data_object):
-    print(
-        "Available commands: LOOK (AT), GO, TAKE, TALK TO, I[NVENTORY], Q[UIT]")
-    print("You can also just enter a direction to go there.")
+    if has_map:
+        print(
+            "Available commands: LOOK, GO, TAKE, TALK TO, I[NVENTORY], M[AP], Q[UIT]")
+    else:
+        print(
+            "Available commands: LOOK, GO, TAKE, TALK TO, I[NVENTORY], Q[UIT]")
+    print("Enter a direction (N, E, S, W) to move.")
     return data_object.current_loc
 
 
@@ -140,6 +150,7 @@ def _talk(data_object, obj1):
     return data_object.current_loc
 
 
+# TODO: Make this work with inventory items.
 def _use(data_object, obj1, obj2):
     if obj1 is None and obj2 is None:
         data_object.stack.append("What do you want to use?")

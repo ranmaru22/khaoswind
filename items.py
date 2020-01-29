@@ -35,6 +35,9 @@ class Item(object):
     def set_pickup_allowed(self):
         self.allow_pickup = True
 
+    def set_usable(self):
+        self.is_usable = True
+
     def set_usable_with(self, other_item):
         self.usable_with.append(other_item)
         if not self.is_usable:

@@ -24,6 +24,9 @@ class Inventory(object):
     def get_item_names(self):
         return [i.name for i in self.items]
 
+    def is_in_inventory(self, item):
+        return item in self.items
+
     def check(self):
         if self.is_empty():
             return "Your pockets are empty."

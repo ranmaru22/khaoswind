@@ -43,8 +43,12 @@ class Main(object):
         keys.set_pickup_allowed()
         chest = self.game_data.get_item_from_name('chest')
         gold = self.game_data.get_item_from_name('gold')
+        room_map = self.game_data.get_item_from_name('map')
         chest.add_contents(gold)
+        chest.add_contents(room_map)
         chest.set_usable_with(keys)
+        room_map.set_usable()
+        room_map.set_pickup_allowed()
         rubble = self.game_data.get_item_from_name('rubble')
         rubble.set_usable_with(stick)
         rubble.set_block_dir('n')
@@ -69,6 +73,7 @@ class Main(object):
                      items.Item('keys'),
                      items.Container('chest'),
                      items.ContainedItem('gold'),
+                     items.ContainedItem('map'),
                      items.Blocker('rubble')
                      ]
         return item_list
