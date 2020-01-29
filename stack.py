@@ -51,6 +51,8 @@ class Stack(object):
         while self.items:
             item = self.items.pop()
             type_ = self.item_types.pop()
+            if item is None:
+                continue
             for line in self._wrapper.wrap(item):
                 if type_ == 1:
                     gf.print_speak(line)
