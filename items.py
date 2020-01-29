@@ -43,7 +43,7 @@ class Item(object):
         if not self.is_usable:
             self.is_usable = True
 
-    def use(self, other_item):
+    def use(self, data_object, other_item):
         if not self.is_usable:
             return f"You cannot use that."
         if len(self.usable_with) > 0:
@@ -53,9 +53,16 @@ class Item(object):
                 return f"That didn't work."
             else:
                 self.used = True
-                return f"You used the {self.name} with the {other_item.name}."
+                return self.trigger_interaction()
         self.used = True
-        return f"You used the {self.name}."
+        return self.trigger_interaction()
+
+    def set_interaction(self, func):
+        """Wrapper function for unique item interactions."""
+        self.interaction = func
+
+    def trigger_interaction(self):
+        return self.interaction()
 
 
 class ContainedItem(Item):
