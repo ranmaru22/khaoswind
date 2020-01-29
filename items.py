@@ -18,6 +18,9 @@ class Item(object):
         self.usable_with = list()
         self.used = False
 
+        # Unique commands which tigger the item's use method.
+        self.unique_verb = str()
+
         self.description = None
         self._get_desc()
 
@@ -43,6 +46,9 @@ class Item(object):
         if not self.is_usable:
             self.is_usable = True
 
+    def set_unique_verb(self, verb):
+        self.unique_verb = verb
+
     def use(self, data_object, other_item):
         if not self.is_usable:
             return f"You cannot use that."
@@ -61,8 +67,8 @@ class Item(object):
         """Wrapper function for unique item interactions."""
         self.interaction = func
 
-    def trigger_interaction(self):
-        return self.interaction()
+    def trigger_interaction(self, *args):
+        return self.interaction(*args)
 
 
 class ContainedItem(Item):

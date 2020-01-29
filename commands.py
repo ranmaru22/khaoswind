@@ -9,6 +9,10 @@ def parser(cmd, data_object):
     directions = ['n', 'e', 's', 'w', 'north', 'east',
                   'south', 'west', 'inside', 'in', 'outside', 'out']
 
+    items_here = data_object.get_items_in_location(
+        data_object.current_loc) + data_object.inventory.get_items()
+    location_unique_verbs = tuple(i.unique_verb for i in items_here)
+
     # Ignore case and whitespace.
     cmd = unicodedata.normalize("NFKD", cmd.casefold().strip())
 
@@ -39,11 +43,16 @@ def parser(cmd, data_object):
         return _take(data_object, obj1)
     if verb in ['talk', 'talk to']:
         return _talk(data_object, obj1)
+
+    obj2 = None
+    if len(verb.split()) == 3:
+        verb, obj2, _ = verb.split()
     if verb.startswith('use'):
-        obj2 = None
-        if len(verb.split()) == 3:
-            verb, obj2, _ = verb.split()
         return _use(data_object, obj1, obj2)
+    if verb.startswith(location_unique_verbs):
+        if obj2:
+            return _use(data_object, obj2, obj1)
+        return _use(data_object, obj1, None)
 
     data_object.stack.append("Hmm, that didn't work out.")
     return data_object.current_loc
@@ -81,6 +90,7 @@ def _print_help(data_object):
         print(
             "Available commands: LOOK, GO, TAKE, TALK TO, I[NVENTORY], Q[UIT]")
     print("Enter a direction (N, E, S, W) to move.")
+    print("Some items might also react to different commands. Get creative!")
     return data_object.current_loc
 
 

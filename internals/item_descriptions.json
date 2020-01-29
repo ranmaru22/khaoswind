@@ -2,10 +2,13 @@
   "stick": ["small, wooden", "A small stick. It does not look very useful."],
   "keys": ["set of brass", "An old key ring with three brass keys."],
   "chest": ["old", "An old chest. Locked with a big padlock."],
-  "gold": ["piece of", "A gold nugget. Valuable but probably useless."],
   "rubble": ["giant pile of", "A big pile of rubble.", "cleared"],
   "map": [
     "old, yellowed",
     "A map of this place. It seems accurate ... you think."
+  ],
+  "pond": [
+    "small, deep",
+    "A small pond that looks impossibly round and deep, and yet you see a light coming from the inside. What is that?"
   ]
 }

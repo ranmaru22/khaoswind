@@ -1,10 +1,14 @@
 {
   "nerat": {
     "1": [
-      "Unidentified vessel travelling at sub warp speed, bearing 235.7. Fluctuations in energy readings from it, Captain. All transporters off. A strange set-up, but I’d say the graviton generator is depolarized.",
-      "The dark colourings of the scrapes are the leavings of natural rubber, a type of non-conductive sole used by researchers experimenting with electricity.",
-      "The molecules must have been partly de-phased by the anyon beam."
+      "Ah, you're back. Now that is a surprise. I still remember the last time you were here. You hated the place and tried to get out of here as soon as possible. And when I told you that you were here by your own design, you wouldn't believe me.",
+      "There it is, that look on your face again. You won't believe me again. *Regret*. It's such a wonderful feeling, isn't it?",
+      "Yes, you are here because *you* wanted to be here. That's how this place works. How to leave, you ask me? I don't know. It was you who left last time, so why don't you ask yourself?"
     ],
-    "2": ["I am done talking to you."]
+    "2": [
+      "I do remember one thing, yes. You did not tell me much last time. almost as if you wanted to keep it a *secret*. But I remember you mentioning a *Sphere*.",
+      "What kind of sphere? How would I know?"
+    ],
+    "3": ["... Have you found your way out yet?"]
   }
 }
