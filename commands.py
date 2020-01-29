@@ -19,7 +19,7 @@ def parser(cmd, data_object):
     if cmd in ['i', 'inv', 'inventory']:
         return _show_inventory(data_object)
     if cmd in ['m', ',map']:
-        if has_map():
+        if has_map(data_object):
             return _print_map(data_object)
     if cmd in directions:
         return _change_loc(data_object, cmd)
@@ -74,7 +74,7 @@ def _system_exit():
 
 
 def _print_help(data_object):
-    if has_map:
+    if has_map(data_object):
         print(
             "Available commands: LOOK, GO, TAKE, TALK TO, I[NVENTORY], M[AP], Q[UIT]")
     else:
