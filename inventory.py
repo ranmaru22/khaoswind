@@ -15,7 +15,7 @@ class Inventory(object):
         self.items.append(item)
 
     def drop(self, item):
-        if item is in self.items:
+        if item in self.items:
             self.items.remove(item)
 
     def get_items(self):
