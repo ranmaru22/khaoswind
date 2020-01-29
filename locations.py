@@ -50,7 +50,7 @@ class Location(object):
         return self.x, self.y
 
     def get_desc(self):
-        """Gets the locations's description text from loc_descriptions.json."""
+        """Loads the locations's description text from loc_descriptions.json."""
         self.description = loc_descriptions[self.name]
         if self.status == 0:
             self.status = 1
@@ -71,10 +71,7 @@ class Location(object):
             text += f"You see {npc.name.capitalize()} {random.choice(['standing there', 'walking around', 'nearby'])}.\n"
         return text.rstrip()
 
-    # TODO: This method next!!
-
     def move(self, data_object, direction):
-        """Moves to an adjacent location in the target direction."""
         # Check for blockers.
         if data_object.is_blocked(direction):
             blockers = [b for b in data_object.get_blockers(
@@ -99,12 +96,11 @@ class Location(object):
         return target_loc
 
     def _parse_direction(self, direction):
-        """Returns coordinate changes for a given direction."""
-        dirs = {
+        vectors = {
             'n': (0, 1),
             'e': (1, 0),
             's': (0, -1),
             'w': (-1, 0)
         }
-        x, y = dirs.get(direction, None)
+        x, y = vectors.get(direction, None)
         return x, y

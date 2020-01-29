@@ -16,6 +16,8 @@ import game_functions as gf
 import settings
 import scenes
 
+from internals import interactions
+
 
 class Main(object):
     """The main class containing the init and run methods."""
@@ -49,6 +51,7 @@ class Main(object):
         chest.set_usable_with(keys)
         room_map.set_usable()
         room_map.set_pickup_allowed()
+        room_map.set_interaction(interactions.map_interaction)
         rubble = self.game_data.get_item_from_name('rubble')
         rubble.set_usable_with(stick)
         rubble.set_block_dir('n')
@@ -56,6 +59,9 @@ class Main(object):
         self.game_data.create_map()
         self.game_data.distribute_items()
         self.game_data.distribute_npcs()
+
+        chest.location = self.game_data.get_loc_from_name("Entrance Room")
+        keys.location = self.game_data.get_loc_from_name("Entrance Room")
 
         with open("internals/logo.txt") as f_obj:
             self.logo = f_obj.read()
