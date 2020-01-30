@@ -84,12 +84,16 @@ class GameData(object):
             raise Exception("More than one location with same coordinates.")
         return target_loc[0] if len(target_loc) == 1 else None
 
-    def is_blocked(self, direction):
-        blockers = self.get_blockers()
+    def is_blocked(self, direction, loc=None):
+        if not loc:
+            loc = self.current_loc
+        blockers = self.get_blockers(loc)
         return any(map(lambda x: direction in x.blocked_directions, blockers))
 
-    def get_blockers(self):
-        return [b for b in self.items if isinstance(b, Blocker) and self.is_in_current_location(b)]
+    def get_blockers(self, loc=None):
+        if not loc:
+            loc = self.current_loc
+        return [b for b in self.items if isinstance(b, Blocker) and self.is_in_target_location(b, loc)]
 
     def distribute_items(self):
         self.add_to_random_location(self.items)
@@ -105,6 +109,9 @@ class GameData(object):
 
     def is_in_current_location(self, obj):
         return obj.location == self.current_loc
+
+    def is_in_target_location(self, obj, loc):
+        return obj.location == loc
 
     def is_in_inventory(self, obj):
         return obj.location == self.inventory

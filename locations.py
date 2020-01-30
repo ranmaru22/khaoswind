@@ -72,23 +72,30 @@ class Location(object):
         return text.rstrip()
 
     def move(self, data_object, direction):
-        # Check for blockers.
-        if data_object.is_blocked(direction):
-            blockers = [b for b in data_object.get_blockers(
-            ) if direction in b.blocked_directions]
-            if blockers:
-                text = str()
-                for blocker in blockers:
-                    text += f"A {blocker.adjectives} {blocker.name} blocks the way.\n"
-            data_object.stack.append(text.rstrip())
-            return self
-
         delta_x, delta_y = self._parse_direction(direction)
         target_loc = data_object.get_loc_from_coordinates(
             self.x + delta_x, self.y + delta_y)
         if target_loc is None:
             data_object.stack.append("There is nothing in this direction.")
             return self
+
+        # Check for blockers.
+        opposite_dir = self._get_opposite(direction)
+        if data_object.is_blocked(direction):
+            blockers = set([b for b in data_object.get_blockers()
+                            if direction in b.blocked_directions])
+        elif data_object.is_blocked(opposite_dir, target_loc):
+            blockers = set([b for b in data_object.get_blockers(target_loc)
+                            if opposite_dir in b.blocked_directions])
+        else:
+            blockers = None
+        if blockers:
+            text = str()
+            for blocker in blockers:
+                text += f"A {blocker.adjectives} {blocker.name} blocks the way.\n"
+            data_object.stack.append(text.rstrip())
+            return self
+
         data_object.stack.append(target_loc.name, 2)
         if target_loc.status == 0:
             data_object.stack.append(target_loc.get_desc())
