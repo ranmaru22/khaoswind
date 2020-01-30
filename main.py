@@ -41,20 +41,34 @@ class Main(object):
 
         stick = self.game_data.get_item_from_name('stick')
         stick.set_pickup_allowed()
+
         keys = self.game_data.get_item_from_name('keys')
         keys.set_pickup_allowed()
-        chest = self.game_data.get_item_from_name('chest')
+
         room_map = self.game_data.get_item_from_name('map')
-        chest.add_contents(room_map)
-        chest.set_usable_with(keys)
-        chest.set_unique_verb("open")
         room_map.set_usable()
         room_map.set_pickup_allowed()
         room_map.set_interaction(interactions.map_interaction)
         room_map.set_unique_verb("read")
+
+        chest = self.game_data.get_item_from_name('chest')
+        chest.add_contents(room_map)
+        chest.set_usable_with(keys)
+        chest.set_unique_verb("open")
+
         rubble = self.game_data.get_item_from_name('rubble')
         rubble.set_usable_with(stick)
         rubble.set_block_dir('n')
+
+        mirror = self.game_data.get_item_from_name('mirror')
+        mirror.set_pickup_allowed()
+
+        sphere = self.game_data.get_item_from_name('sphere')
+
+        pond = self.game_data.get_item_from_name('pond')
+        pond.set_usable_with(mirror)
+        pond.set_interaction(interactions.pond_interaction)
+        pond.add_contents(sphere)
 
         self.game_data.create_map()
         self.game_data.distribute_items()
@@ -62,6 +76,8 @@ class Main(object):
 
         chest.location = self.game_data.get_loc_from_name("Entrance Room")
         keys.location = self.game_data.get_loc_from_name("Entrance Room")
+        rubble.location = self.game_data.get_loc_from_name("Debris Room")
+        pond.location = self.game_data.get_loc_from_name("Water Chamber")
 
         with open("internals/logo.txt") as f_obj:
             self.logo = f_obj.read()
@@ -77,8 +93,11 @@ class Main(object):
     def init_items(self):
         item_list = [items.Item('stick'),
                      items.Item('keys'),
+                     items.Item('mirror'),
                      items.Container('chest'),
+                     items.Container('pond'),
                      items.ContainedItem('map'),
+                     items.ContainedItem('sphere'),
                      items.Blocker('rubble')
                      ]
         return item_list

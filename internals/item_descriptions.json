@@ -10,5 +10,13 @@
   "pond": [
     "small, deep",
     "A small pond that looks impossibly round and deep, and yet you see a light coming from the inside. What is that?"
+  ],
+  "mirror": [
+    "small, cracked hand",
+    "A little mirror that is cracked. It looks old, really old, and yet the reflection is pristine."
+  ],
+  "sphere": [
+    "heavy copper",
+    "A perfect sphere. It looks like it's made out of copper, but maybe it's something else."
   ]
 }

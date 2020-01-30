@@ -17,6 +17,7 @@ class Item(object):
         self.is_usable = False
         self.usable_with = list()
         self.used = False
+        self.has_interaction = False
 
         # Unique commands which tigger the item's use method.
         self.unique_verb = str()
@@ -65,6 +66,7 @@ class Item(object):
 
     def set_interaction(self, func):
         """Wrapper function for unique item interactions."""
+        self.has_interaction = True
         self.interaction = func
 
     def trigger_interaction(self, *args):
@@ -92,15 +94,18 @@ class Container(Item):
     def use(self, data_object, item):
         """Opens the items and adds the contents to the player's inventory."""
         if self.used:
-            return f"The {self.name} is already open."
+            return f"There is nothing left inside the {self.name}."
         if item is None:
             return f"You need a tool for that."
         elif item not in self.usable_with:
             return f"That cannot use the {item.name} here."
 
         text = str()
-        data_object.stack.append(
-            f"You unlocked the {self.name} with the {item.name}.")
+        if self.has_interaction:
+            text = self.trigger_interaction()
+        else:
+            data_object.stack.append(
+                f"You unlocked the {self.name} with the {item.name}.")
         for new_item in self.contains:
             data_object.inventory.add(data_object, new_item)
             text += f"\nYou take the {new_item.name} from the {self.name}."
@@ -135,4 +140,6 @@ class Blocker(Item):
         elif item not in self.usable_with:
             return f"That cannot use the {item.name} here."
         self._resolve()
+        if self.has_interaction:
+            return self.trigger_interaction()
         return f"You {self.clear_msg} the {self.name} with the {item.name}."
