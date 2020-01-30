@@ -111,7 +111,6 @@ class GameData(object):
         return obj.location == self.current_loc
 
     def is_in_adjacent_location(self, obj):
-        x, y = self.current_loc.x, self.current_loc.y
         adjacent_locs = [loc for loc in self.locations if self.is_north(
             loc) or self.is_east(loc) or self.is_south(loc) or self.is_west(loc)]
         return obj.location in adjacent_locs

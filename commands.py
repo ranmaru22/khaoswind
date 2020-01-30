@@ -3,6 +3,7 @@
 import unicodedata
 
 import game_functions as gf
+from items import Blocker
 
 
 def parser(cmd, data_object):
@@ -169,7 +170,8 @@ def _use(data_object, obj1, obj2):
     if use_item and data_object.is_in_current_location(use_item):
         data_object.stack.append(use_item.use(data_object, tool_item))
         return data_object.current_loc
-    elif use_item and data_object.is_in_adjacent_location(use_item):
+    # TODO: How to pass the type?!
+    elif use_item and data_object.is_in_adjacent_location(use_item) and isinstance(use_item, Blocker):
         data_object.stack.append(use_item.use(data_object, tool_item))
         return data_object.current_loc
     elif use_item and data_object.is_in_inventory(use_item):
