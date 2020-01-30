@@ -125,6 +125,8 @@ class Blocker(Item):
         self.location = None
         self.used = True
 
+        # TODO: Make Blockers clearable from both ends!
+
     def use(self, data_object, item):
         if self.used:
             return None

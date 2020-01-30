@@ -23,8 +23,8 @@ def parser(cmd, data_object):
     if cmd in ['i', 'inv', 'inventory']:
         return _show_inventory(data_object)
     if cmd in ['m', 'map']:
-        if has_map(data_object):
-            return _print_map(data_object)
+        # if has_map(data_object):
+        return _print_map(data_object)
     if cmd in directions:
         return _change_loc(data_object, cmd)
 
@@ -167,6 +167,9 @@ def _use(data_object, obj1, obj2):
     use_item = data_object.get_item_from_name(obj1)
     tool_item = data_object.get_item_from_name(obj2)
     if use_item and data_object.is_in_current_location(use_item):
+        data_object.stack.append(use_item.use(data_object, tool_item))
+        return data_object.current_loc
+    elif use_item and data_object.is_in_adjacent_location(use_item):
         data_object.stack.append(use_item.use(data_object, tool_item))
         return data_object.current_loc
     elif use_item and data_object.is_in_inventory(use_item):
